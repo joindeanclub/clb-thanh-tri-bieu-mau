@@ -163,7 +163,7 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
   <div class="me hide" id="me"></div>
 </header>
 <main>
-  <div id="loading" class="card"><h2>Đang tải danh sách…</h2><p class="sub">Vui lòng chờ, còn khoảng <b id="cd" style="font-size:22px;color:#0e6fa8">5</b> giây</p></div>
+  <div id="loading" class="card"><h2>Đang tải danh sách…</h2><p class="sub">Vui lòng chờ trong giây lát…</p></div>
 
   <section id="who" class="hide"><div class="hello"><h1>Xin chào! Bạn là ai?</h1><p class="sub">Chọn tên của bạn trong Ban điều hành để bắt đầu. Không cần đăng nhập.</p></div><div class="bans" id="people"></div></section>
   <section id="home" class="hide">
@@ -633,15 +633,6 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
     var found = c.people.filter(function (p) { return p.ten === saved; })[0];
     if (found) { me = found; showHome(); } else { showWho(); }
   }).withFailureHandler(function (e) { $('loading').classList.remove('hide'); $('loading').innerHTML = '<h2>Không mở được biểu mẫu</h2><p class="sub">' + esc(e.message || e) + '</p>'; }).getContext();
-})();
-</script>
-<script>
-(function () {
-  var n = 5, el = document.getElementById('cd'), box = document.getElementById('loading');
-  var t = setInterval(function () {
-    if (!box || box.classList.contains('hide')) { clearInterval(t); return; }
-    if (n > 1) { n--; if (el) el.textContent = n; }
-  }, 1000);
 })();
 </script>
 </body>
