@@ -147,6 +147,8 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
 .note2 { font-size: 12px; color: var(--mute); text-align: center; margin-top: 10px; }
 
 /* ===== Cuộc họp ===== */
+.latest { background: #e6f7ee; border: 2px solid #12a56b; color: #0a7a44; border-radius: 12px; padding: 10px 12px; font-weight: 800; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.latest .dot { width: 10px; height: 10px; border-radius: 50%; background: #14d36e; box-shadow: 0 0 8px #14d36e; animation: glowG 1.6s ease-in-out infinite alternate; flex: none; }
 .sel2 select { width: 100%; padding: 12px; border: 2px solid #bccae3; border-radius: 12px; font: inherit; font-weight: 700; background: #fff; color: var(--navy); }
 .slw { position: relative; margin-top: 10px; background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; box-shadow: 0 8px 20px rgba(0,0,0,.3); }
 .slw img { width: 100%; height: 100%; object-fit: contain; display: block; }
@@ -838,14 +840,12 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
     fetch('slides/manifest.json?t=' + Date.now()).then(function (r) { if (!r.ok) throw new Error('nf'); return r.json(); }).then(function (m) {
       MT.list = (m.months || []).slice().sort(function (a, b) { return a.key < b.key ? 1 : -1; });
       if (!MT.list.length) throw new Error('empty');
-      $('mtBody').innerHTML = '<div class="sel2"><select id="mtSel">' + MT.list.map(function (x) {
-        return '<option value="' + esc(x.key) + '">' + esc(x.label) + '</option>'; }).join('') + '</select></div>' +
+      $('mtBody').innerHTML = '<div class="latest" id="mtLabel"></div>' +
         '<div class="slw" id="slw"><img id="slImg" alt=""><span class="sdtag">SD</span></div>' +
         '<div class="ctrl2"><button class="a g" id="mtPrev">◀ Trước</button><span class="c" id="mtCnt"></span><button class="a" id="mtNext">Sau ▶</button></div>' +
         '<div class="chips" id="mtChips"></div>' +
         '<div class="mtrow"><button class="btn sec2" id="mtFull">⛶ Toàn màn hình</button></div>' +
         '<p class="note2" id="mtInfo"></p>';
-      $('mtSel').onchange = function () { loadDeck($('mtSel').value); };
       $('mtPrev').onclick = function () { gotoSlide(MT.i - 1); };
       $('mtNext').onclick = function () { gotoSlide(MT.i + 1); };
       $('mtFull').onclick = function () { var el = $('slw'); (el.requestFullscreen || el.webkitRequestFullscreen || function () {}).call(el); };
@@ -861,12 +861,14 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
   function slideUrl(i) { return 'slides/' + MT.key + '/' + p2(i + 1) + '.jpg?v=' + (MT.ver || ''); }
   function loadDeck(key) {
     var it = MT.list.filter(function (x) { return x.key === key; })[0]; if (!it) return;
+    var keep = (MT.key === key && MT.ver !== String(it.updated || '')) ? MT.i : 0;
     MT.key = key; MT.n = it.count; MT.ver = String(it.updated || ''); MT.i = 0;
+    $('mtLabel').innerHTML = '<span class="dot"></span> Slide mới nhất · ' + esc(it.label);
     $('mtChips').innerHTML = Array.apply(null, Array(MT.n)).map(function (_, k) { return '<button class="chip" data-i="' + k + '">' + (k + 1) + '</button>'; }).join('');
     [].forEach.call($('mtChips').querySelectorAll('.chip'), function (c) { c.onclick = function () { gotoSlide(Number(c.getAttribute('data-i'))); }; });
     var u = updText(it.updated);
     $('mtInfo').innerHTML = 'Ảnh SD 854×480 · ' + MT.n + ' slide' + (u ? ' · đăng ' + u.replace('<br>', ' ').replace('Cập nhật lần cuối lúc:', '').trim() : '');
-    gotoSlide(0);
+    gotoSlide(Math.min(keep, MT.n - 1));
   }
   function gotoSlide(i) {
     if (i < 0 || i >= MT.n) return;
@@ -876,6 +878,17 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
     var on = $('mtChips').querySelector('.chip.on'); if (on && on.scrollIntoView) on.scrollIntoView({ block: 'nearest', inline: 'center' });
     if (i + 1 < MT.n) { var pre = new Image(); pre.src = slideUrl(i + 1); }
   }
+  // Luôn xem bản mới nhất: tự kiểm tra lại mỗi phút khi đang ở màn hình Cuộc họp
+  function refreshMeeting() {
+    if (!$('meeting') || $('meeting').classList.contains('hide') || !MT.list.length) return;
+    fetch('slides/manifest.json?t=' + Date.now()).then(function (r) { return r.json(); }).then(function (m) {
+      var l = (m.months || []).slice().sort(function (a, b) { return a.key < b.key ? 1 : -1; });
+      if (!l.length) return;
+      var top = l[0];
+      if (top.key !== MT.key || String(top.updated || '') !== MT.ver) { MT.list = l; loadDeck(top.key); }
+    }).catch(function () {});
+  }
+  setInterval(refreshMeeting, 60000);
   document.addEventListener('keydown', function (e) {
     if (!$('meeting') || $('meeting').classList.contains('hide') || !MT.n) return;
     if (e.key === 'ArrowRight') gotoSlide(MT.i + 1); else if (e.key === 'ArrowLeft') gotoSlide(MT.i - 1);
