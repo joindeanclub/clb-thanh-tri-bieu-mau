@@ -147,11 +147,52 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
     return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(o) })
       .then(function (r) { return r.json(); }).then(unwrap);
   }
+  var DEFAULT_CTX = {
+    people: [
+      { ten: 'MR PHẠM VĂN THÀNH', vaiTro: 'CHỦ TỊCH', ban: '*' },
+      { ten: 'MR HỒ XUÂN THÀNH', vaiTro: 'PHÓ CHỦ TỊCH', ban: '*' },
+      { ten: 'MS NGUYỄN THU TRANG', vaiTro: 'TỔNG THƯ KÝ', ban: '*' },
+      { ten: 'MS LÊ NGỌC DUYÊN', vaiTro: 'TB THÀNH VIÊN', ban: 'thanhvien' },
+      { ten: 'MR NGUYỄN ĐỨC CÔNG', vaiTro: 'TB TRUYỀN THÔNG & SỰ KIỆN', ban: 'truyenthong' },
+      { ten: 'MR NGUYỄN THANH TÙNG', vaiTro: 'TB KHÁCH MỜI', ban: '*' },
+      { ten: 'MS NGUYỄN PHI NGA', vaiTro: 'TB ĐÀO TẠO', ban: 'daotao' }
+    ],
+    all: [
+      { key: 'thanhvien', ten: 'Ban Thành viên' },
+      { key: 'truyenthong', ten: 'Ban Truyền thông' },
+      { key: 'daotao', ten: 'Ban Đào tạo' }
+    ]
+  };
+  function withTimeout(p, ms) {
+    return new Promise(function (res, rej) {
+      var t = setTimeout(function () { rej(new Error('Quá thời gian chờ, vui lòng thử lại')); }, ms);
+      p.then(function (v) { clearTimeout(t); res(v); }, function (e) { clearTimeout(t); rej(e); });
+    });
+  }
+  function friendly(e) {
+    var m = String((e && e.message) || e || '');
+    if (/Failed to fetch|NetworkError|Load failed|TypeError/i.test(m)) return 'Không kết nối được tới máy chủ. Hãy kiểm tra mạng (Wi-Fi/4G) rồi thử lại.';
+    return m;
+  }
   var methods = {
-    getContext: function () { return get('action=context'); },
-    listRecent: function (ban) { return get('action=recent&ban=' + encodeURIComponent(ban)); },
-    submit: function (ban, kind, d) { return post({ action: 'submit', ban: ban, kind: kind, data: d }); },
-    remove: function (ban, tab, id) { return post({ action: 'remove', ban: ban, tab: tab, id: id }); }
+    getContext: function () {
+      // Hiện danh sách ngay (không chờ mạng); cập nhật ngầm cho lần mở sau
+      var cached = null;
+      try { cached = JSON.parse(localStorage.getItem('clb-ctx') || 'null'); } catch (e) {}
+      get('action=context').then(function (c) {
+        if (c && c.people && c.people.length) { try { localStorage.setItem('clb-ctx', JSON.stringify(c)); } catch (e) {} }
+      }, function () {});
+      return Promise.resolve(cached && cached.people && cached.people.length ? cached : DEFAULT_CTX);
+    },
+    listRecent: function (ban) {
+      return withTimeout(get('action=recent&ban=' + encodeURIComponent(ban)), 20000).catch(function () { return {}; });
+    },
+    submit: function (ban, kind, d) {
+      return withTimeout(post({ action: 'submit', ban: ban, kind: kind, data: d }), 90000).catch(function (e) { throw new Error(friendly(e)); });
+    },
+    remove: function (ban, tab, id) {
+      return withTimeout(post({ action: 'remove', ban: ban, tab: tab, id: id }), 30000).catch(function (e) { throw new Error(friendly(e)); });
+    }
   };
   function chain(ok, fail) {
     var o = { withSuccessHandler: function (f) { return chain(f, fail); }, withFailureHandler: function (f) { return chain(ok, f); } };
