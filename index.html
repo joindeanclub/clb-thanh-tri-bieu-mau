@@ -91,6 +91,51 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
 #crop label{display:block;font-weight:600;font-size:14px;margin-top:8px}
 #crop input[type=range]{width:100%}
 #crop .r{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+
+/* ===== Giao diện điện thoại ===== */
+@media (max-width: 700px) {
+  body { font-size: 16px; }
+  header { padding: 10px 12px; gap: 10px; flex-wrap: nowrap; }
+  header img { height: 40px; padding: 3px; border-radius: 8px; }
+  header .t b { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  header .t span { display: none; }
+  header .me { display: none; }
+  main { padding: 14px 12px 40px; }
+  h1 { font-size: 22px; }
+  h2 { font-size: 19px; }
+  .hello { margin: 2px 0 14px; }
+  .sub { font-size: 14px; margin-bottom: 12px; }
+  .bans { grid-template-columns: 1fr; gap: 10px; }
+  .ban { display: grid; grid-template-columns: 54px 1fr; column-gap: 14px; row-gap: 2px; align-items: center; padding: 12px 14px; border-radius: 16px; }
+  .ban .ic { grid-row: 1 / 4; width: 54px; height: 54px; font-size: 26px; border-radius: 14px; }
+  .ban b { font-size: 17px; line-height: 1.25; }
+  .ban p { font-size: 13.5px; line-height: 1.35; }
+  .ban .go { margin-top: 0; font-size: 13px; }
+  #people .ban .go { display: none; }
+  #people .ban { padding: 10px 14px; }
+  #people .ban .ic { grid-row: 1 / 3; width: 46px; height: 46px; font-size: 22px; }
+  #people .ban b { font-size: 16px; }
+  .top { gap: 8px; margin-bottom: 10px; }
+  .back { padding: 8px 12px; font-size: 14px; }
+  .crumb { font-size: 15px; }
+  .card { padding: 16px 14px; border-radius: 16px; }
+  .tabs { margin-bottom: 12px; }
+  .tabs button { min-width: 0; padding: 10px 6px; font-size: 14px; }
+  .sec { margin-top: 14px; padding-top: 14px; }
+  .sec h3 { font-size: 16px; }
+  .f > label { font-size: 14px; }
+  .f input, .f select, .f textarea { padding: 12px; font-size: 16px; }
+  .photo { flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+  .photo .btn { width: 100%; }
+  .pv { width: 120px; height: 120px; }
+  .btn.big { padding: 15px; font-size: 17px; }
+  #side { display: none; }
+  .recent { margin-top: 16px; }
+  .it { font-size: 14px; }
+  .done { padding: 22px 6px; }
+  .done .ck { width: 70px; height: 70px; font-size: 40px; }
+  #crop .box { padding: 16px; }
+}
 </style>
 </head>
 <body>
