@@ -618,10 +618,10 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
   $('back').onclick = goHome;
 
   var TILE = {
-    thanhvien:   { ic: '🧑‍💼', ten: 'Ban Thành viên', note: 'Thành viên mới kết nạp' },
-    truyenthong: { ic: '📣', ten: 'Ban Truyền thông', note: 'Sự kiện sắp tới' },
+    thanhvien:   { ic: '🧑‍💼', ten: 'Ban Thành viên', note: 'Thêm thành viên mới' },
+    truyenthong: { ic: '📣', ten: 'Ban Sự kiện', note: 'Thêm sự kiện mới' },
     daotao:      { ic: '🎓', ten: 'Ban Đào tạo', note: 'Diễn giả & Showcase' },
-    taichinh:    { ic: '💰', ten: 'Báo cáo tài chính', note: 'Số dư, thu, chi' }
+    taichinh:    { ic: '💰', ten: 'Ban Tài chính', note: 'Báo cáo quỹ CLB' }
   };
   var ORDER = ['thanhvien', 'truyenthong', 'daotao', 'taichinh'];
   var lastUpd = {};
@@ -631,12 +631,12 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
     // s: 'yyyy-MM-dd HH:mm:ss' hoặc ISO
     var m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/.exec(String(s || ''));
     if (!m) return '';
-    return 'Cập nhật mới nhất lúc ' + m[4] + ' giờ ' + m[5] + ' phút ngày ' + m[3] + '/' + m[2] + '/' + m[1];
+    return 'Cập nhật lần cuối lúc:<br>' + m[4] + 'h' + m[5] + ' ngày ' + m[3] + '/' + m[2] + '/' + m[1];
   }
   function paintUpd(k) {
     var el = $('upd_' + k); if (!el) return;
     var t = updText(lastUpd[k]);
-    el.textContent = t || 'Chưa có cập nhật';
+    el.innerHTML = t || 'Chưa có cập nhật';
     el.className = 'upd' + (t ? ' on' : '');
   }
   function saveUpd() { try { localStorage.setItem('clb-upd', JSON.stringify(lastUpd)); } catch (e) {} }
