@@ -69,7 +69,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     <div class="seg"><button id="tChung">✉ Thư mời chung</button><button id="tKhach">👤 Thư mời khách</button></div>
 
     <div class="sec"><i>1</i>Thời gian &amp; địa điểm <span class="tag">dùng chung cho mọi thiệp</span></div>
-    <div class="f"><label>Tên thiệp mời</label><input id="title" placeholder="HỌP ĐỊNH KỲ · BUỔI 46"><div class="sug" id="sug"></div></div>
+    <div class="f"><label>Buổi Matching Offline số</label><input type="number" id="session" min="1" placeholder="Tự tính theo ngày họp"><div class="hint" style="margin-top:4px">Tên thiệp: MATCHING OFFLINE + số buổi. Để trống thì app tự tính theo ngày họp.</div></div>
     <div class="two">
       <div class="f"><label>Ngày</label><input type="date" id="date"></div>
       <div class="f"><label>Giờ</label><input type="time" id="time"></div>
@@ -148,12 +148,13 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
   }
   var S = {
     type: 'chung', cur: 0,
-    title: 'HỌP ĐỊNH KỲ', date: nextDay14(), time: '14:30', venue: 'Hei Coffee',
+    title: 'MATCHING OFFLINE', session: '', date: nextDay14(), time: '14:30', venue: 'Hei Coffee',
     address: 'TT 14-15 Khu đấu giá Tứ Hiệp, Thanh Trì, Hà Nội',
-    c1: 'Đánh giá hoạt động', c2: 'Kế hoạch tháng tới · Kết nối hội viên', nk: 'Nhiệm kỳ VII',
+    c1: 'Giao lưu, kết nối, đánh giá hoạt động', c2: '', nk: '',
     guests: [{ name: '', xh: 'Anh', cd: '', ct: '', lv: '', nm: '', photo: '' }]
   };
   try { var sv = JSON.parse(localStorage.getItem(LS) || 'null'); if (sv) S = Object.assign(S, sv); } catch (e) {}
+  if (S.c1 === 'Đánh giá hoạt động' && S.c2 === 'Kế hoạch tháng tới · Kết nối hội viên') { S.c1 = 'Giao lưu, kết nối, đánh giá hoạt động'; S.c2 = ''; }
   var qs = new URLSearchParams(location.search);
   if (qs.get('demo')) {
     S.type = qs.get('type') === 'khach' ? 'khach' : 'chung';
@@ -165,7 +166,6 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     if (qs.get('title')) S.title = qs.get('title');
   }
   if (!S.guests || !S.guests.length) S.guests = [{ name: '', xh: 'Anh', cd: '', ct: '', lv: '', nm: '', photo: '' }];
-  if (S.title === 'HỌP ĐỊNH KỲ') S.title = 'HỌP ĐỊNH KỲ · BUỔI ' + (function () { var m = /^(\d{4})-(\d{2})/.exec(S.date || ''); return m ? 45 + (Number(m[1]) - 2026) * 12 + (Number(m[2]) - 9) : 46; })();
   function save() { try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { toast('Bộ nhớ trình duyệt đầy, hãy bớt ảnh khách'); } }
   function toast(t) { var e = $('toast'); e.textContent = t; e.style.display = 'block'; clearTimeout(e._t); e._t = setTimeout(function () { e.style.display = 'none'; }, 2600); }
 
@@ -191,10 +191,9 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
   function timeLine() { var d = fmtDate(S.date); return [S.time, d].filter(Boolean).join(' · '); }
 
   function eventPhrase() {
-    var t = String(S.title || 'HỌP ĐỊNH KỲ').split('·')[0].trim().toLowerCase();
-    t = t.replace(/(^|[\s,.;:()-])(i{1,3}|iv|vi{0,3}|ix|x{1,3})(?=$|[\s,.;:()-])/g, function (m, a, b) { return a + b.toUpperCase(); });
-    return /^họp/.test(t) ? 'buổi ' + t : t;
+    return 'buổi Matching Offline ' + (S.session || sessionNo());
   }
+  function titleText() { return 'MATCHING OFFLINE ' + (S.session || sessionNo()); }
   function sessionNo() {
     var m = /^(\d{4})-(\d{2})/.exec(S.date || ''); if (!m) return 46;
     return 45 + (Number(m[1]) - 2026) * 12 + (Number(m[2]) - 9);
@@ -260,6 +259,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     ctx.fillStyle = '#b8892f'; ctx.font = 'bold 11.5px ' + SERIF; ctx.textBaseline = 'alphabetic';
     spaced(ctx, label, x + 62, y + pad + 12, 2.6, 'left');
     ctx.fillStyle = '#0d2150'; ctx.font = 'bold ' + vf + 'px ' + SERIF;
+    while (ctx.measureText(value).width > 420 && vf > 15) { vf -= 1; ctx.font = 'bold ' + vf + 'px ' + SERIF; }
     ctx.textAlign = 'left'; ctx.fillText(value, x + 62, y + pad + 12 + 4 + vf * 1.02);
     var h = pad + 16 + vf * 1.25 + (small ? 19 : 0) + pad;
     if (small) {
@@ -310,9 +310,9 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
 
     // ---- do kich thuoc cac khoi de chia deu khoang trong ----
     var logoW = khach ? 112 : 150;
-    var logoH = logo.naturalWidth ? logoW * 475 / logo.naturalWidth : logoW * .68;
+    var logoH = logoW * 475 / 699;
     var clubH = khach ? 18 : 20;
-    var TT = (S.title || 'HỌP ĐỊNH KỲ').toUpperCase().replace(/\s+/g, ' ').trim();
+    var TT = titleText();
     var tfs = khach ? 34 : 40;
     ctx.font = 'bold ' + tfs + 'px ' + SERIF;
     while (tfs > 22 && ctx.measureText(TT).width + (TT.length - 1) * 2 > 470) { tfs -= 1; ctx.font = 'bold ' + tfs + 'px ' + SERIF; }
@@ -363,8 +363,13 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
         [['tham dự ' + eventPhrase() + ' của ', 'i'], ['CLB Doanh nghiệp Thanh Trì', 'b']]
       ];
       ctx.textAlign = 'left';
+      var gfs = 17.5;
+      parts.forEach(function (line) {
+        var w0 = 0; line.forEach(function (p) { ctx.font = (p[1] === 'b' ? 'bold ' : 'italic ') + '17.5px ' + SERIF; w0 += ctx.measureText(p[0]).width; });
+        if (w0 > 500) gfs = Math.min(gfs, 17.5 * 500 / w0);
+      });
       parts.forEach(function (line, li) {
-        var w = 0, fonts = line.map(function (p) { return (p[1] === 'b' ? 'bold ' : 'italic ') + '17.5px ' + SERIF; });
+        var w = 0, fonts = line.map(function (p) { return (p[1] === 'b' ? 'bold ' : 'italic ') + gfs.toFixed(2) + 'px ' + SERIF; });
         line.forEach(function (p, i) { ctx.font = fonts[i]; w += ctx.measureText(p[0]).width; });
         var x = 300 - w / 2;
         line.forEach(function (p, i) {
@@ -473,13 +478,13 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     $('dlAll').textContent = '⬇ Tải tất cả (' + S.guests.length + ' thiệp, ZIP)';
     $('hint').textContent = k ? 'Mỗi khách có một thiệp độc lập (ảnh riêng, tên riêng). «Tải tất cả» nén thành 1 file ZIP, mỗi thiệp một ảnh đặt tên theo khách.'
       : 'Thư mời chung gửi toàn bộ hội viên. Ngày giờ, địa điểm, nội dung đều sửa được.';
-    $('title').value = S.title; $('date').value = S.date; renderSug(); $('time').value = S.time; $('venue').value = S.venue; $('address').value = S.address;
+    $('session').value = S.session || ''; $('date').value = S.date; $('time').value = S.time; $('venue').value = S.venue; $('address').value = S.address;
     $('c1').value = S.c1; $('c2').value = S.c2;
     if (k) { renderGuests(); fillForm(); }
     redraw();
   }
-  function bind(id, key) { $(id).addEventListener('input', function () { S[key] = $(id).value; save(); redraw(); if (key === 'date') renderSug(); }); }
-  [['title', 'title'], ['date', 'date'], ['time', 'time'], ['venue', 'venue'], ['address', 'address'], ['c1', 'c1'], ['c2', 'c2']].forEach(function (p) { bind(p[0], p[1]); });
+  function bind(id, key) { $(id).addEventListener('input', function () { S[key] = $(id).value; save(); redraw(); if (key === 'date') redraw(); }); }
+  [['session', 'session'], ['date', 'date'], ['time', 'time'], ['venue', 'venue'], ['address', 'address'], ['c1', 'c1'], ['c2', 'c2']].forEach(function (p) { bind(p[0], p[1]); });
   [['gName', 'name'], ['gCd', 'cd'], ['gCt', 'ct'], ['gLv', 'lv'], ['gNm', 'nm']].forEach(function (p) {
     $(p[0]).addEventListener('input', function () { cur()[p[1]] = $(p[0]).value; save(); redraw(); if (p[1] === 'name') renderGuests(); });
   });
@@ -548,7 +553,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
   }
-  function fname(g, i) { return S.type === 'khach' ? 'thu-moi-' + (i + 1) + '-' + slug(g.name) + '.png' : 'thu-moi-' + slug(S.title || 'hop-dinh-ky') + '.png'; }
+  function fname(g, i) { return S.type === 'khach' ? 'thu-moi-' + (i + 1) + '-' + slug(g.name) + '.png' : 'thu-moi-matching-offline-' + (S.session || sessionNo()) + '.png'; }
   $('dlOne').onclick = function () { renderBlob(cur()).then(function (b) { download(b, fname(cur(), S.cur)); toast('Đã tải thiệp'); }); };
 
   var CRC = (function () { var t = [], n, c, k; for (n = 0; n < 256; n++) { c = n; for (k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
