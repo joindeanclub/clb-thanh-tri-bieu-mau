@@ -52,6 +52,8 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
 #crop label{display:block;font-weight:600;font-size:13px;margin-top:6px}
 #crop input[type=range]{width:100%}
 #crop .r{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+#goPre{display:none;position:fixed;right:14px;bottom:18px;z-index:15;border:0;border-radius:26px;padding:13px 18px;font:inherit;font-weight:800;color:#fff;background:linear-gradient(120deg,#0d2150,#1c4fb0);box-shadow:0 8px 20px rgba(8,18,50,.4)}
+@media(max-width:900px){#goPre{display:block}}
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 20px;border-radius:24px;font-weight:700;display:none;z-index:30}
 </style>
 </head>
@@ -124,6 +126,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
   <label>Dịch dọc<input type="range" id="cy" min="0" max="100" value="35"></label>
   <div class="r"><button class="btn" id="cNo">Hủy</button><button class="btn" id="cOk" style="background:#0f8a57;color:#fff">Dùng ảnh này</button></div>
 </div></div>
+<button id="goPre" type="button">👁 Xem thiệp</button>
 <div id="toast"></div>
 
 <script>
@@ -163,7 +166,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
   // ---------- anh ----------
   var WEB = location.hostname.indexOf('github.io') >= 0;
   if (WEB) {
-    document.querySelector('header').innerHTML = '<b>✉ Soạn thư mời · CLB DN Thanh Trì</b><a href="../">← Về trang chính</a>';
+    document.querySelector('header').innerHTML = '<b>✉ Soạn thư mời</b><a href="../">← Trang chính</a>';
   }
   var logo = new Image(); logo.src = WEB ? 'logo.png' : '/assets/image6.png'; logo.onload = redraw;
   var cache = {};
@@ -550,6 +553,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     });
   };
 
+  $('goPre').onclick = function () { $('cv').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
   renderAll();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
 })();
