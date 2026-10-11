@@ -66,8 +66,9 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     <div class="seg"><button id="tChung">✉ Thư mời chung</button><button id="tKhach">👤 Thư mời khách</button></div>
 
     <div class="sec"><i>1</i>Thời gian &amp; địa điểm <span class="tag">dùng chung cho mọi thiệp</span></div>
+    <div class="f"><label>Tên thiệp mời (tiêu đề lớn trên thiệp)</label><input id="title" placeholder="HỌP ĐỊNH KỲ"></div>
     <div class="two">
-      <div class="f"><label>Ngày họp</label><input type="date" id="date"></div>
+      <div class="f"><label>Ngày</label><input type="date" id="date"></div>
       <div class="f"><label>Giờ</label><input type="time" id="time"></div>
     </div>
     <div class="f"><label>Địa điểm (mặc định Hei Coffee, sửa được)</label><input id="venue"></div>
@@ -144,7 +145,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
   }
   var S = {
     type: 'chung', cur: 0,
-    date: nextDay14(), time: '14:30', venue: 'Hei Coffee',
+    title: 'HỌP ĐỊNH KỲ', date: nextDay14(), time: '14:30', venue: 'Hei Coffee',
     address: 'TT 14-15 Khu đấu giá Tứ Hiệp, Thanh Trì, Hà Nội',
     c1: 'Đánh giá hoạt động', c2: 'Kế hoạch tháng tới · Kết nối hội viên', nk: 'Nhiệm kỳ VII',
     guests: [{ name: '', xh: 'Anh', cd: '', ct: '', lv: '', nm: '', photo: '' }]
@@ -158,6 +159,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
       { name: 'Trần Minh Anh', xh: 'Anh', cd: 'Phó giám đốc kinh doanh', ct: 'Công ty Cổ phần Công nghệ và Thương mại Quốc tế Hoàng Gia Việt Nam', lv: 'Công nghệ', nm: 'Lê Ngọc Duyên', photo: '/assets/face/do-manh-thanh.jpg' }
     ];
     S.cur = Number(qs.get('g') || 0);
+    if (qs.get('title')) S.title = qs.get('title');
   }
   if (!S.guests || !S.guests.length) S.guests = [{ name: '', xh: 'Anh', cd: '', ct: '', lv: '', nm: '', photo: '' }];
   function save() { try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { toast('Bộ nhớ trình duyệt đầy, hãy bớt ảnh khách'); } }
@@ -184,6 +186,11 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
   }
   function timeLine() { var d = fmtDate(S.date); return [S.time, d].filter(Boolean).join(' · '); }
 
+  function eventPhrase() {
+    var t = String(S.title || 'HỌP ĐỊNH KỲ').trim().toLowerCase();
+    t = t.replace(/(^|[\s,.;:()-])(i{1,3}|iv|vi{0,3}|ix|x{1,3})(?=$|[\s,.;:()-])/g, function (m, a, b) { return a + b.toUpperCase(); });
+    return /^họp/.test(t) ? 'buổi ' + t : t;
+  }
   function wrap(ctx, text, maxW) {
     var words = String(text || '').split(/\s+/), lines = [], cur = '';
     words.forEach(function (w) {
@@ -285,9 +292,12 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     ctx.fillStyle = '#9a6f1d'; ctx.font = 'bold ' + (khach ? 15 : 17) + 'px ' + SERIF;
     spaced(ctx, khach ? 'THƯ MỜI KHÁCH' : 'THƯ MỜI', 300, y + 15, khach ? 9 : 11, 'center');
     y += khach ? 21 : 23;
-    ctx.fillStyle = NAVY; ctx.font = 'bold ' + (khach ? 42 : 58) + 'px ' + SERIF;
-    y += 6; spaced(ctx, 'HỌP ĐỊNH KỲ', 300, y + (khach ? 36 : 49), 2, 'center');
-    y += khach ? 44 : 61;
+    var TT = (S.title || 'HỌP ĐỊNH KỲ').toUpperCase().replace(/\s+/g, ' ').trim();
+    var tfs = khach ? 42 : 58;
+    ctx.fillStyle = NAVY; ctx.font = 'bold ' + tfs + 'px ' + SERIF;
+    while (tfs > 24 && ctx.measureText(TT).width + (TT.length - 1) * 2 > 470) { tfs -= 1; ctx.font = 'bold ' + tfs + 'px ' + SERIF; }
+    y += 6; spaced(ctx, TT, 300, y + Math.round(tfs * 0.84), 2, 'center');
+    y += Math.round(tfs * 1.05) + (khach ? 0 : 0);
 
     if (!khach) {
       if (S.nk) {
@@ -299,7 +309,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
       ctx.textAlign = 'left';
       var parts = [
         [['Trân trọng kính mời ', 'i'], ['Quý Anh/Chị hội viên', 'b']],
-        [['tham dự buổi họp định kỳ của ', 'i'], ['CLB Doanh nghiệp Thanh Trì', 'b']]
+        [['tham dự ' + eventPhrase() + ' của ', 'i'], ['CLB Doanh nghiệp Thanh Trì', 'b']]
       ];
       parts.forEach(function (line, li) {
         var w = 0, fonts = line.map(function (p) { return (p[1] === 'b' ? 'bold ' : 'italic ') + '17.5px ' + SERIF; });
@@ -357,7 +367,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
       y = gy + gh + 18;
       ctx.textAlign = 'left';
       ctx.fillStyle = '#26324f'; ctx.font = 'italic 16px ' + SERIF; ctx.textAlign = 'center';
-      ctx.fillText('Trân trọng kính mời Quý khách đến dự buổi họp', 300, y + 18);
+      ctx.fillText('Trân trọng kính mời Quý khách đến dự ' + eventPhrase(), 300, y + 18);
       ctx.fillText('để giao lưu và kết nối cùng các doanh nhân', 300, y + 18 + 26);
       y += 52 + 18;
     }
@@ -431,13 +441,13 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     $('dlAll').textContent = '⬇ Tải tất cả (' + S.guests.length + ' thiệp, ZIP)';
     $('hint').textContent = k ? 'Mỗi khách có một thiệp độc lập (ảnh riêng, tên riêng). «Tải tất cả» nén thành 1 file ZIP, mỗi thiệp một ảnh đặt tên theo khách.'
       : 'Thư mời chung gửi toàn bộ hội viên. Ngày giờ, địa điểm, nội dung đều sửa được.';
-    $('date').value = S.date; $('time').value = S.time; $('venue').value = S.venue; $('address').value = S.address;
+    $('title').value = S.title; $('date').value = S.date; $('time').value = S.time; $('venue').value = S.venue; $('address').value = S.address;
     $('c1').value = S.c1; $('c2').value = S.c2; $('nk').value = S.nk;
     if (k) { renderGuests(); fillForm(); }
     redraw();
   }
   function bind(id, key) { $(id).addEventListener('input', function () { S[key] = $(id).value; save(); redraw(); }); }
-  [['date', 'date'], ['time', 'time'], ['venue', 'venue'], ['address', 'address'], ['c1', 'c1'], ['c2', 'c2'], ['nk', 'nk']].forEach(function (p) { bind(p[0], p[1]); });
+  [['title', 'title'], ['date', 'date'], ['time', 'time'], ['venue', 'venue'], ['address', 'address'], ['c1', 'c1'], ['c2', 'c2'], ['nk', 'nk']].forEach(function (p) { bind(p[0], p[1]); });
   [['gName', 'name'], ['gCd', 'cd'], ['gCt', 'ct'], ['gLv', 'lv'], ['gNm', 'nm']].forEach(function (p) {
     $(p[0]).addEventListener('input', function () { cur()[p[1]] = $(p[0]).value; save(); redraw(); if (p[1] === 'name') renderGuests(); });
   });
@@ -506,7 +516,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
   }
-  function fname(g, i) { return S.type === 'khach' ? 'thu-moi-' + (i + 1) + '-' + slug(g.name) + '.png' : 'thu-moi-hop-dinh-ky.png'; }
+  function fname(g, i) { return S.type === 'khach' ? 'thu-moi-' + (i + 1) + '-' + slug(g.name) + '.png' : 'thu-moi-' + slug(S.title || 'hop-dinh-ky') + '.png'; }
   $('dlOne').onclick = function () { renderBlob(cur()).then(function (b) { download(b, fname(cur(), S.cur)); toast('Đã tải thiệp'); }); };
 
   var CRC = (function () { var t = [], n, c, k; for (n = 0; n < 256; n++) { c = n; for (k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
