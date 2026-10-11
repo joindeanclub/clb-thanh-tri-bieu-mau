@@ -116,7 +116,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
   <aside class="card pre">
     <canvas id="cv" width="600" height="900"></canvas>
     <div class="nav" id="gnav"><button id="prevG">◀</button><span id="gcnt"></span><button id="nextG">▶</button></div>
-    <div class="hint">Ảnh xuất ra 1200×1800 (tỉ lệ 2:3), sắc nét để gửi Zalo hoặc in.</div>
+    <div class="hint">Ảnh JPG 1200×1800 (tỉ lệ 2:3), sắc nét để gửi Zalo hoặc in.</div>
   </aside>
 </main>
 
@@ -454,7 +454,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     $('gcnt').textContent = 'Khách ' + (S.cur + 1) + ' / ' + S.guests.length;
     $('dlAll').style.display = k && S.guests.length > 1 ? '' : 'none';
     $('dlOne').classList.toggle('full', !(k && S.guests.length > 1));
-    $('dlOne').textContent = k ? '⬇ Tải thiệp khách này' : '⬇ Tải thiệp (PNG)';
+    $('dlOne').textContent = k ? '⬇ Tải thiệp khách này (JPG)' : '⬇ Tải thiệp (JPG)';
     $('dlAll').textContent = '⬇ Tải tất cả (' + S.guests.length + ' thiệp, ZIP)';
     $('hint').textContent = k ? 'Mỗi khách có một thiệp độc lập (ảnh riêng, tên riêng). «Tải tất cả» nén thành 1 file ZIP, mỗi thiệp một ảnh đặt tên theo khách.'
       : 'Thư mời chung gửi toàn bộ hội viên. Ngày giờ, địa điểm, nội dung đều sửa được.';
@@ -511,7 +511,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
   function renderBlob(g) {
     return new Promise(function (res) {
       var c = document.createElement('canvas'); draw(c, g, 2);
-      c.toBlob(function (b) { res(b); }, 'image/png');
+      c.toBlob(function (b) { res(b); }, 'image/jpeg', 0.93);
     });
   }
   function showOverlay(blob, name) {
@@ -529,11 +529,11 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
   }
   var COARSE = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
   function download(blob, name) {
-    if (COARSE && blob.type === 'image/png') { showOverlay(blob, name); return; }
+    if (COARSE && blob.type === 'image/jpeg') { showOverlay(blob, name); return; }
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
   }
-  function fname(g, i) { return S.type === 'khach' ? 'thu-moi-' + (i + 1) + '-' + slug(g.name) + '.png' : 'thu-moi-matching-offline-' + (S.session || sessionNo()) + '.png'; }
+  function fname(g, i) { return S.type === 'khach' ? 'thu-moi-' + (i + 1) + '-' + slug(g.name) + '.jpg' : 'thu-moi-matching-offline-' + (S.session || sessionNo()) + '.jpg'; }
   $('dlOne').onclick = function () { renderBlob(cur()).then(function (b) { download(b, fname(cur(), S.cur)); toast('Đã tải thiệp'); }); };
 
   var CRC = (function () { var t = [], n, c, k; for (n = 0; n < 256; n++) { c = n; for (k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
@@ -562,21 +562,17 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     var done = [], used = {};
     S.guests.reduce(function (p, g, i) {
       return p.then(function () { return renderBlob(g).then(function (b) { return b.arrayBuffer(); }).then(function (ab) {
-        var n = fname(g, i); if (used[n]) n = n.replace('.png', '-' + i + '.png'); used[n] = 1;
+        var n = fname(g, i); if (used[n]) n = n.replace('.jpg', '-' + i + '.jpg'); used[n] = 1;
         done.push({ name: n, data: new Uint8Array(ab) });
       }); });
     }, Promise.resolve()).then(function () { download(zip(done), 'thu-moi-khach.zip'); toast('Đã tải ' + done.length + ' thiệp (ZIP)'); });
   };
   $('share').onclick = function () {
     renderBlob(cur()).then(function (b) {
-      var file = new File([b], fname(cur(), S.cur), { type: 'image/png' });
+      var file = new File([b], fname(cur(), S.cur), { type: 'image/jpeg' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         navigator.share({ files: [file], title: 'Thư mời CLB DN Thanh Trì' }).catch(function () {});
-      } else if (!COARSE && navigator.clipboard && window.ClipboardItem) {
-        navigator.clipboard.write([new ClipboardItem({ 'image/png': b })]).then(function () {
-          toast('Đã sao chép ảnh. Mở Zalo và dán (Ctrl+V) vào khung chat.');
-        }, function () { download(b, file.name); toast('Đã tải ảnh. Mở Zalo và đính kèm ảnh.'); });
-      } else { download(b, file.name); toast('Đã tải ảnh. Mở Zalo và đính kèm ảnh.'); }
+      } else { download(b, file.name); if (!COARSE) toast('Đã tải ảnh JPG. Mở Zalo và đính kèm ảnh này.'); }
     });
   };
 
