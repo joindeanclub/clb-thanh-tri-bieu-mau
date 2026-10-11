@@ -844,7 +844,7 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
       MT.list = (m.months || []).slice().sort(function (a, b) { return a.key < b.key ? 1 : -1; });
       if (!MT.list.length) throw new Error('empty');
       $('mtBody').innerHTML = '<div class="latest" id="mtLabel"></div>' +
-        '<div class="slw" id="slw"><img id="slImg" alt=""><span class="sdtag">SD</span></div>' +
+        '<div class="slw" id="slw"><img id="slImg" alt=""><span class="sdtag">HD</span></div>' +
         '<div class="ctrl2"><button class="a g" id="mtPrev">◀ Trước</button><span class="c" id="mtCnt"></span><button class="a" id="mtNext">Sau ▶</button></div>' +
         '<div class="chips" id="mtChips"></div>' +
         '<div class="mtrow"><button class="btn sec2" id="mtFull">⛶ Toàn màn hình</button></div>' +
@@ -870,7 +870,7 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
     $('mtChips').innerHTML = Array.apply(null, Array(MT.n)).map(function (_, k) { return '<button class="chip" data-i="' + k + '">' + (k + 1) + '</button>'; }).join('');
     [].forEach.call($('mtChips').querySelectorAll('.chip'), function (c) { c.onclick = function () { gotoSlide(Number(c.getAttribute('data-i'))); }; });
     var u = updText(it.updated);
-    $('mtInfo').innerHTML = 'Ảnh SD 854×480 · ' + MT.n + ' slide' + (u ? ' · đăng ' + u.replace('<br>', ' ').replace('Cập nhật lần cuối lúc:', '').trim() : '');
+    $('mtInfo').innerHTML = 'Ảnh HD 1280×720 · ' + MT.n + ' slide' + (u ? ' · đăng ' + u.replace('<br>', ' ').replace('Cập nhật lần cuối lúc:', '').trim() : '');
     gotoSlide(Math.min(keep, MT.n - 1));
   }
   function gotoSlide(i) {

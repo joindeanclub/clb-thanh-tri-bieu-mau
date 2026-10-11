@@ -92,7 +92,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
         </div>
         <div class="two">
           <div class="f"><label>Chức danh</label><input id="gCd"></div>
-          <div class="f"><label>Công ty</label><input id="gCt"></div>
+          <div class="f"><label>Tên công ty (ghi đầy đủ, không viết tắt)</label><input id="gCt" placeholder="Ví dụ: Công ty TNHH Thương mại ABC Việt Nam"></div>
         </div>
         <div class="two">
           <div class="f"><label>Lĩnh vực</label><input id="gLv"></div>
@@ -297,6 +297,20 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     ctx.font = 'bold ' + tfs + 'px ' + SERIF;
     while (tfs > 22 && ctx.measureText(TT).width + (TT.length - 1) * 2 > 470) { tfs -= 1; ctx.font = 'bold ' + tfs + 'px ' + SERIF; }
     var titleH = Math.round(tfs * 1.12);
+    var gInfo = null, gh = 172;
+    if (khach) {
+      var tw0 = 512 - 22 - 66 * 2 - 20 - 22;
+      var nm0 = ((g.xh && g.xh !== 'Quý khách' ? g.xh + ' ' : '') + (g.name || '(Họ tên khách)')).trim();
+      var fs0 = 27; ctx.font = 'bold ' + fs0 + 'px ' + SERIF;
+      while (ctx.measureText(nm0).width > tw0 * 1.9 && fs0 > 18) { fs0 -= 1; ctx.font = 'bold ' + fs0 + 'px ' + SERIF; }
+      var nlines = wrap(ctx, nm0, tw0).slice(0, 2);
+      ctx.font = 'bold 15px ' + SERIF; var cdl = g.cd ? wrap(ctx, g.cd, tw0) : [];
+      ctx.font = '15px ' + SERIF; var ctl = g.ct ? wrap(ctx, g.ct, tw0) : [];
+      ctx.font = 'italic 13.5px ' + SERIF; var lvl = g.lv ? wrap(ctx, 'Lĩnh vực: ' + g.lv, tw0) : [];
+      var th = 24 + 34 - 20 + nlines.length * (fs0 + 3) + 6 + cdl.length * 19 + ctl.length * 19 + lvl.length * 18 + (g.nm ? 36 : 0) + 20;
+      gh = Math.max(172, Math.round(th));
+      gInfo = { fs: fs0, nl: nlines, cd: cdl, ct: ctl, lv: lvl, tw: tw0 };
+    }
     var rows = [
       { k: 'cal', l: 'THỜI GIAN', v: timeLine() || '—' },
       { k: 'pin', l: 'ĐỊA ĐIỂM', v: S.venue || '—', s: S.address }
@@ -312,7 +326,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     var boxH = hs.reduce(function (a, c) { return a + c; }, 0) + 12;
     var blocks = [logoH, clubH, 14, khach ? 18 : 23, titleH, khach ? 172 : 14, khach ? 51 : 56, boxH];
     if (khach) blocks.splice(5, 0, 0); // giu thu tu
-    var sum = logoH + clubH + 14 + (khach ? 18 : 23) + titleH + (khach ? 172 : 14) + (khach ? 51 : 56) + boxH;
+    var sum = logoH + clubH + 14 + (khach ? 18 : 23) + titleH + (khach ? gh : 14) + (khach ? 51 : 56) + boxH;
     var top = 46, limit = 742;
     var G = Math.max(8, Math.min(30, (limit - top - sum) / 7));
     var y = top;
@@ -359,7 +373,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
       });
       y += 56 + G;
     } else {
-      var gx = 44, gw = 512, gh = 172, gy = y;
+      var gx = 44, gw = 512, gy = y;
       panel(ctx, gx, gy, gw, gh, 20, 'rgba(255,255,255,.84)');
       var pc = gy + gh / 2, pr = 66;
       ctx.save();
@@ -377,22 +391,23 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
         ctx.beginPath(); ctx.ellipse(gx + 22 + pr, pc + 40, 36, 28, 0, 0, 7); ctx.fill();
       }
       ctx.restore();
-      var tx = gx + 22 + pr * 2 + 20, tw = gx + gw - 22 - tx;
-      var ty = gy + 24;
+      var tx = gx + 22 + pr * 2 + 20;
+      var ty = gy + (gh - (gInfo.nl.length * (gInfo.fs + 3) + 6 + gInfo.cd.length * 19 + gInfo.ct.length * 19 + gInfo.lv.length * 18 + (g.nm ? 36 : 0) + 18)) / 2;
       ctx.fillStyle = GOLD; ctx.font = 'bold 11.5px ' + SERIF; spaced(ctx, 'KÍNH MỜI', tx, ty + 8, 3, 'left');
-      var nm = ((g.xh && g.xh !== 'Quý khách' ? g.xh + ' ' : '') + (g.name || '(Họ tên khách)')).trim();
-      var fs = 27; ctx.font = 'bold ' + fs + 'px ' + SERIF; while (ctx.measureText(nm).width > tw && fs > 17) { fs -= 1; ctx.font = 'bold ' + fs + 'px ' + SERIF; }
-      var nl = wrap(ctx, nm, tw);
-      ctx.fillStyle = NAVY; ctx.textAlign = 'left';
-      nl.slice(0, 2).forEach(function (ln, i) { ctx.fillText(ln, tx, ty + 34 + i * (fs + 3)); });
-      ty += 34 + (Math.min(nl.length, 2) - 1) * (fs + 3) + 10;
-      var role = [g.cd, g.ct].filter(Boolean).join(' · ');
-      if (role) { ctx.fillStyle = '#1a2540'; ctx.font = '15px ' + SERIF; wrap(ctx, role, tw).slice(0, 2).forEach(function (ln, i) { ctx.fillText(ln, tx, ty + 14 + i * 19); ty += i ? 19 : 0; }); ty += 22; }
-      if (g.lv) { ctx.fillStyle = '#55607a'; ctx.font = 'italic 13.5px ' + SERIF; ctx.fillText(wrap(ctx, 'Lĩnh vực: ' + g.lv, tw)[0], tx, ty + 12); ty += 20; }
+      ty += 12;
+      ctx.fillStyle = NAVY; ctx.textAlign = 'left'; ctx.font = 'bold ' + gInfo.fs + 'px ' + SERIF;
+      gInfo.nl.forEach(function (ln) { ctx.fillText(ln, tx, ty + gInfo.fs); ty += gInfo.fs + 3; });
+      ty += 4;
+      ctx.fillStyle = '#1a2540'; ctx.font = 'bold 15px ' + SERIF;
+      gInfo.cd.forEach(function (ln) { ctx.fillText(ln, tx, ty + 14); ty += 19; });
+      ctx.font = '15px ' + SERIF;
+      gInfo.ct.forEach(function (ln) { ctx.fillText(ln, tx, ty + 14); ty += 19; });
+      ctx.fillStyle = '#55607a'; ctx.font = 'italic 13.5px ' + SERIF;
+      gInfo.lv.forEach(function (ln) { ctx.fillText(ln, tx, ty + 13); ty += 18; });
       if (g.nm) {
         var bt = 'Người mời: ' + g.nm; ctx.font = 'bold 12.5px ' + SERIF;
-        var bw = Math.min(tw, ctx.measureText(bt).width + 24);
-        var by = Math.min(ty + 4, gy + gh - 42);
+        var bw = Math.min(gInfo.tw, ctx.measureText(bt).width + 24);
+        var by = ty + 8;
         rr(ctx, tx, by, bw, 26, 13); ctx.fillStyle = NAVY; ctx.fill(); ctx.strokeStyle = GOLD; ctx.lineWidth = 1; ctx.stroke();
         ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.fillText(bt, tx + 12, by + 17.5);
       }
