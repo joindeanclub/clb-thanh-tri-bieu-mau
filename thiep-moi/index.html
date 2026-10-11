@@ -54,6 +54,9 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
 #crop .r{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
 #goPre{display:none;position:fixed;right:14px;bottom:18px;z-index:15;border:0;border-radius:26px;padding:13px 18px;font:inherit;font-weight:800;color:#fff;background:linear-gradient(120deg,#0d2150,#1c4fb0);box-shadow:0 8px 20px rgba(8,18,50,.4)}
 @media(max-width:900px){#goPre{display:block}}
+.sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sug button{border:1.5px solid #bccae3;background:#f6f9ff;color:var(--navy);border-radius:999px;padding:6px 12px;font:inherit;font-weight:700;font-size:12.5px;cursor:pointer;text-align:left}
+.sug button:hover{border-color:var(--navy2);background:#eaf0ff}
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 20px;border-radius:24px;font-weight:700;display:none;z-index:30}
 </style>
 </head>
@@ -66,7 +69,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     <div class="seg"><button id="tChung">✉ Thư mời chung</button><button id="tKhach">👤 Thư mời khách</button></div>
 
     <div class="sec"><i>1</i>Thời gian &amp; địa điểm <span class="tag">dùng chung cho mọi thiệp</span></div>
-    <div class="f"><label>Tên thiệp mời (tiêu đề lớn trên thiệp)</label><input id="title" placeholder="HỌP ĐỊNH KỲ"></div>
+    <div class="f"><label>Tên thiệp mời</label><input id="title" placeholder="HỌP ĐỊNH KỲ · BUỔI 46"><div class="sug" id="sug"></div></div>
     <div class="two">
       <div class="f"><label>Ngày</label><input type="date" id="date"></div>
       <div class="f"><label>Giờ</label><input type="time" id="time"></div>
@@ -78,7 +81,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
         <div class="f"><label>Nội dung (dòng 1)</label><input id="c1"></div>
         <div class="f"><label>Nội dung (dòng 2)</label><input id="c2"></div>
       </div>
-      <div class="f"><label>Nhiệm kỳ (dòng dưới tiêu đề, để trống nếu không cần)</label><input id="nk"></div>
+
     </div>
 
     <div id="khachOnly">
@@ -162,6 +165,7 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     if (qs.get('title')) S.title = qs.get('title');
   }
   if (!S.guests || !S.guests.length) S.guests = [{ name: '', xh: 'Anh', cd: '', ct: '', lv: '', nm: '', photo: '' }];
+  if (S.title === 'HỌP ĐỊNH KỲ') S.title = 'HỌP ĐỊNH KỲ · BUỔI ' + (function () { var m = /^(\d{4})-(\d{2})/.exec(S.date || ''); return m ? 45 + (Number(m[1]) - 2026) * 12 + (Number(m[2]) - 9) : 46; })();
   function save() { try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { toast('Bộ nhớ trình duyệt đầy, hãy bớt ảnh khách'); } }
   function toast(t) { var e = $('toast'); e.textContent = t; e.style.display = 'block'; clearTimeout(e._t); e._t = setTimeout(function () { e.style.display = 'none'; }, 2600); }
 
@@ -187,9 +191,30 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
   function timeLine() { var d = fmtDate(S.date); return [S.time, d].filter(Boolean).join(' · '); }
 
   function eventPhrase() {
-    var t = String(S.title || 'HỌP ĐỊNH KỲ').trim().toLowerCase();
+    var t = String(S.title || 'HỌP ĐỊNH KỲ').split('·')[0].trim().toLowerCase();
     t = t.replace(/(^|[\s,.;:()-])(i{1,3}|iv|vi{0,3}|ix|x{1,3})(?=$|[\s,.;:()-])/g, function (m, a, b) { return a + b.toUpperCase(); });
     return /^họp/.test(t) ? 'buổi ' + t : t;
+  }
+  function sessionNo() {
+    var m = /^(\d{4})-(\d{2})/.exec(S.date || ''); if (!m) return 46;
+    return 45 + (Number(m[1]) - 2026) * 12 + (Number(m[2]) - 9);
+  }
+  function suggestions() {
+    var n = sessionNo(), m = /^(\d{4})-(\d{2})/.exec(S.date || ''), mo = m ? Number(m[2]) : (new Date().getMonth() + 1);
+    return [
+      'HỌP ĐỊNH KỲ · BUỔI ' + n,
+      'MATCHING OFFLINE ' + n,
+      'GIAO LƯU & KẾT NỐI DOANH NHÂN · BUỔI ' + n,
+      'TALKSHOW THÁNG ' + mo + ' · BUỔI ' + n,
+      'SINH HOẠT ĐỊNH KỲ THÁNG ' + mo + ' · BUỔI ' + n
+    ];
+  }
+  function renderSug() {
+    var box = $('sug'); if (!box) return;
+    box.innerHTML = suggestions().map(function (t, i) { return '<button type="button" data-i="' + i + '">' + t + '</button>'; }).join('');
+    [].forEach.call(box.querySelectorAll('button'), function (b) {
+      b.onclick = function () { S.title = suggestions()[Number(b.getAttribute('data-i'))]; $('title').value = S.title; save(); redraw(); };
+    });
   }
   function wrap(ctx, text, maxW) {
     var words = String(text || '').split(/\s+/), lines = [], cur = '';
@@ -245,72 +270,99 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     return h;
   }
 
+  function rr(ctx, x, y, w, hh, r) {
+    ctx.beginPath(); ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + hh, r); ctx.arcTo(x + w, y + hh, x, y + hh, r);
+    ctx.arcTo(x, y + hh, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+  function panel(ctx, x, y, w, hh, r, fill) {
+    rr(ctx, x, y, w, hh, r); ctx.fillStyle = fill; ctx.fill();
+    rr(ctx, x + .75, y + .75, w - 1.5, hh - 1.5, r - .75); ctx.strokeStyle = '#b8892f'; ctx.lineWidth = 1.5; ctx.stroke();
+    rr(ctx, x + 4, y + 4, w - 8, hh - 8, Math.max(r - 4, 4)); ctx.strokeStyle = 'rgba(184,137,47,.5)'; ctx.lineWidth = .8; ctx.stroke();
+  }
+
   function draw(canvas, g, scale) {
     var ctx = canvas.getContext('2d');
     canvas.width = 600 * scale; canvas.height = 900 * scale;
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     var khach = S.type === 'khach';
     var NAVY = '#0d2150', GOLD = '#b8892f';
-    // nen
-    ctx.fillStyle = NAVY; ctx.fillRect(0, 0, 600, 900);
+    ctx.textBaseline = 'alphabetic';
+    // nen trang + the bo goc
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 600, 900);
+    rr(ctx, 0, 0, 600, 900, 36); ctx.fillStyle = NAVY; ctx.fill();
+    // to giay bo goc
+    ctx.save();
+    rr(ctx, 14, 14, 572, 872, 26); ctx.clip();
     var bg = ctx.createLinearGradient(0, 14, 0, 886); bg.addColorStop(0, '#fdfbf5'); bg.addColorStop(1, '#f7f1e3');
     ctx.fillStyle = bg; ctx.fillRect(14, 14, 572, 872);
     var rg = ctx.createRadialGradient(300, 14, 0, 300, 14, 330); rg.addColorStop(0, 'rgba(255,255,255,.95)'); rg.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.fillStyle = rg; ctx.fillRect(14, 14, 572, 872);
-    ctx.strokeStyle = GOLD; ctx.lineWidth = 1.5; ctx.strokeRect(20.75, 20.75, 558.5, 858.5);
-    ctx.strokeStyle = 'rgba(184,137,47,.55)'; ctx.lineWidth = .8; ctx.strokeRect(26.4, 26.4, 547.2, 847.2);
-    // goc
-    ctx.strokeStyle = GOLD; ctx.lineWidth = 2;
-    [[32, 32, 1, 1], [568, 32, -1, 1], [32, 810, 1, -1], [568, 810, -1, -1]].forEach(function (c) {
-      ctx.beginPath(); ctx.moveTo(c[0] + c[2] * 30, c[1]); ctx.lineTo(c[0], c[1]); ctx.lineTo(c[0], c[1] + c[3] * 30); ctx.stroke();
-    });
-    // thanh chan
     var bd = ctx.createLinearGradient(14, 0, 586, 0); bd.addColorStop(0, NAVY); bd.addColorStop(.5, '#16367a'); bd.addColorStop(1, NAVY);
     ctx.fillStyle = bd; ctx.fillRect(14, 828, 572, 58);
     ctx.fillStyle = GOLD; ctx.fillRect(14, 828, 572, 3);
+    ctx.restore();
     ctx.fillStyle = '#efd98f'; ctx.font = 'bold 12.5px ' + SERIF;
     spaced(ctx, 'KẾT NỐI GIAO THƯƠNG · HỢP TÁC CÙNG PHÁT TRIỂN', 300, 861, 2.4, 'center');
+    // khung vang bo goc
+    rr(ctx, 21, 21, 558, 800, 20); ctx.strokeStyle = GOLD; ctx.lineWidth = 1.5; ctx.stroke();
+    rr(ctx, 27, 27, 546, 788, 15); ctx.strokeStyle = 'rgba(184,137,47,.5)'; ctx.lineWidth = .8; ctx.stroke();
 
-    var y = khach ? 40 : 48;
-    // huy hieu
-    var md = khach ? 84 : 112, mc = y + md / 2;
-    ctx.save();
-    ctx.shadowColor = 'rgba(13,33,80,.28)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 6;
-    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(300, mc, md / 2, 0, 7); ctx.fill();
-    ctx.restore();
-    ctx.strokeStyle = 'rgba(184,137,47,.25)'; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(300, mc, md / 2 + 2.5, 0, 7); ctx.stroke();
-    ctx.strokeStyle = GOLD; ctx.lineWidth = khach ? 2 : 3; ctx.beginPath(); ctx.arc(300, mc, md / 2, 0, 7); ctx.stroke();
+    // ---- do kich thuoc cac khoi de chia deu khoang trong ----
+    var logoW = khach ? 112 : 150;
+    var logoH = logo.naturalWidth ? logoW * 475 / logo.naturalWidth : logoW * .68;
+    var clubH = khach ? 18 : 20;
+    var TT = (S.title || 'HỌP ĐỊNH KỲ').toUpperCase().replace(/\s+/g, ' ').trim();
+    var tfs = khach ? 34 : 40;
+    ctx.font = 'bold ' + tfs + 'px ' + SERIF;
+    while (tfs > 22 && ctx.measureText(TT).width + (TT.length - 1) * 2 > 470) { tfs -= 1; ctx.font = 'bold ' + tfs + 'px ' + SERIF; }
+    var titleH = Math.round(tfs * 1.12);
+    var rows = [
+      { k: 'cal', l: 'THỜI GIAN', v: timeLine() || '—' },
+      { k: 'pin', l: 'ĐỊA ĐIỂM', v: S.venue || '—', s: S.address }
+    ];
+    if (!khach && (S.c1 || S.c2)) rows.push({ k: 'ppl', l: 'NỘI DUNG', v: S.c1 || '—', s: S.c2 });
+    var big = !khach;
+    var hs = rows.map(function (r) {
+      var pad = big ? 13 : 14, vf = big ? 22 : 20;
+      var hh = pad * 2 + 16 + vf * 1.25;
+      if (r.s) { ctx.font = '13.5px ' + SERIF; hh += 19 + (wrap(ctx, r.s, 560 - 62 - 44 - 36).length - 1) * 18; }
+      return hh;
+    });
+    var boxH = hs.reduce(function (a, c) { return a + c; }, 0) + 12;
+    var blocks = [logoH, clubH, 14, khach ? 18 : 23, titleH, khach ? 172 : 14, khach ? 51 : 56, boxH];
+    if (khach) blocks.splice(5, 0, 0); // giu thu tu
+    var sum = logoH + clubH + 14 + (khach ? 18 : 23) + titleH + (khach ? 172 : 14) + (khach ? 51 : 56) + boxH;
+    var top = 46, limit = 742;
+    var G = Math.max(8, Math.min(30, (limit - top - sum) / 7));
+    var y = top;
+
+    // ---- logo noi bat (khong khung tron), bo dong chu nho cua logo ----
     if (logo.complete && logo.naturalWidth) {
-      var lw = khach ? 64 : 86, lh = lw * logo.naturalHeight / logo.naturalWidth;
-      ctx.drawImage(logo, 300 - lw / 2, mc - lh / 2, lw, lh);
+      ctx.save();
+      ctx.shadowColor = 'rgba(27,79,179,.35)'; ctx.shadowBlur = 16; ctx.shadowOffsetY = 5;
+      ctx.drawImage(logo, 0, 0, logo.naturalWidth, 475 * logo.naturalWidth / 699, 300 - logoW / 2, y, logoW, logoH);
+      ctx.restore();
     }
-    y += md + (khach ? 8 : 12);
+    y += logoH + G * .6;
     ctx.fillStyle = NAVY; ctx.font = 'bold ' + (khach ? 13 : 14.5) + 'px ' + SERIF;
     spaced(ctx, 'CLB DOANH NGHIỆP THANH TRÌ', 300, y + (khach ? 14 : 16), 3.2, 'center');
-    y += khach ? 20 : 22;
-    y += khach ? 10 : 14; orn(ctx, y + 7); y += 14 + (khach ? 10 : 14);
-    ctx.fillStyle = '#9a6f1d'; ctx.font = 'bold ' + (khach ? 15 : 17) + 'px ' + SERIF;
-    spaced(ctx, khach ? 'THƯ MỜI KHÁCH' : 'THƯ MỜI', 300, y + 15, khach ? 9 : 11, 'center');
-    y += khach ? 21 : 23;
-    var TT = (S.title || 'HỌP ĐỊNH KỲ').toUpperCase().replace(/\s+/g, ' ').trim();
-    var tfs = khach ? 42 : 58;
+    y += clubH + G * .8;
+    orn(ctx, y + 7); y += 14 + G;
+    ctx.fillStyle = '#9a6f1d'; ctx.font = 'bold ' + (khach ? 14 : 16) + 'px ' + SERIF;
+    spaced(ctx, khach ? 'THƯ MỜI KHÁCH' : 'THƯ MỜI', 300, y + 14, khach ? 9 : 11, 'center');
+    y += (khach ? 18 : 23) + G * .5;
     ctx.fillStyle = NAVY; ctx.font = 'bold ' + tfs + 'px ' + SERIF;
-    while (tfs > 24 && ctx.measureText(TT).width + (TT.length - 1) * 2 > 470) { tfs -= 1; ctx.font = 'bold ' + tfs + 'px ' + SERIF; }
-    y += 6; spaced(ctx, TT, 300, y + Math.round(tfs * 0.84), 2, 'center');
-    y += Math.round(tfs * 1.05) + (khach ? 0 : 0);
+    spaced(ctx, TT, 300, y + Math.round(tfs * 0.86), 2, 'center');
+    y += titleH + G;
 
     if (!khach) {
-      if (S.nk) {
-        y += 6; ctx.fillStyle = '#55607a'; ctx.font = 'italic 15px ' + SERIF; ctx.textAlign = 'center';
-        ctx.fillText(S.nk, 300, y + 15); y += 20;
-      }
-      y += 14; orn(ctx, y + 7); y += 14 + 14;
-      y += 4;
-      ctx.textAlign = 'left';
+      orn(ctx, y + 7); y += 14 + G;
       var parts = [
         [['Trân trọng kính mời ', 'i'], ['Quý Anh/Chị hội viên', 'b']],
         [['tham dự ' + eventPhrase() + ' của ', 'i'], ['CLB Doanh nghiệp Thanh Trì', 'b']]
       ];
+      ctx.textAlign = 'left';
       parts.forEach(function (line, li) {
         var w = 0, fonts = line.map(function (p) { return (p[1] === 'b' ? 'bold ' : 'italic ') + '17.5px ' + SERIF; });
         line.forEach(function (p, i) { ctx.font = fonts[i]; w += ctx.measureText(p[0]).width; });
@@ -320,33 +372,28 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
           x += ctx.measureText(p[0]).width;
         });
       });
-      y += 56 + 20;
+      y += 56 + G;
     } else {
-      // khung khach moi
-      y += 20;
       var gx = 44, gw = 512, gh = 172, gy = y;
-      ctx.fillStyle = 'rgba(255,255,255,.82)'; ctx.fillRect(gx, gy, gw, gh);
-      ctx.strokeStyle = GOLD; ctx.lineWidth = 1.5; ctx.strokeRect(gx + .75, gy + .75, gw - 1.5, gh - 1.5);
-      ctx.strokeStyle = 'rgba(184,137,47,.5)'; ctx.lineWidth = .8; ctx.strokeRect(gx + 3.4, gy + 3.4, gw - 6.8, gh - 6.8);
+      panel(ctx, gx, gy, gw, gh, 20, 'rgba(255,255,255,.84)');
       var pc = gy + gh / 2, pr = 66;
       ctx.save();
       ctx.shadowColor = 'rgba(13,33,80,.25)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 5;
-      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(gx + 20 + pr, pc, pr, 0, 7); ctx.fill(); ctx.restore();
-      ctx.strokeStyle = GOLD; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(gx + 20 + pr, pc, pr - 1.5, 0, 7); ctx.stroke();
-      ctx.save(); ctx.beginPath(); ctx.arc(gx + 20 + pr, pc, pr - 7, 0, 7); ctx.clip();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(gx + 22 + pr, pc, pr, 0, 7); ctx.fill(); ctx.restore();
+      ctx.strokeStyle = GOLD; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(gx + 22 + pr, pc, pr - 1.5, 0, 7); ctx.stroke();
+      ctx.save(); ctx.beginPath(); ctx.arc(gx + 22 + pr, pc, pr - 7, 0, 7); ctx.clip();
       var im = photoImg(g.photo);
       if (im) {
         var s = Math.max((pr * 2) / im.width, (pr * 2) / im.height);
-        ctx.drawImage(im, gx + 20 + pr - im.width * s / 2, pc - im.height * s / 2, im.width * s, im.height * s);
+        ctx.drawImage(im, gx + 22 + pr - im.width * s / 2, pc - im.height * s / 2, im.width * s, im.height * s);
       } else {
-        ctx.fillStyle = '#e3eaf6'; ctx.fillRect(gx + 20, pc - pr, pr * 2, pr * 2);
-        ctx.fillStyle = '#9aa9c4'; ctx.beginPath(); ctx.arc(gx + 20 + pr, pc - 12, 20, 0, 7); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(gx + 20 + pr, pc + 40, 36, 28, 0, 0, 7); ctx.fill();
+        ctx.fillStyle = '#e3eaf6'; ctx.fillRect(gx + 22, pc - pr, pr * 2, pr * 2);
+        ctx.fillStyle = '#9aa9c4'; ctx.beginPath(); ctx.arc(gx + 22 + pr, pc - 12, 20, 0, 7); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(gx + 22 + pr, pc + 40, 36, 28, 0, 0, 7); ctx.fill();
       }
       ctx.restore();
-      // chu
-      var tx = gx + 20 + pr * 2 + 20, tw = gx + gw - 20 - tx;
-      var ty = gy + 22;
+      var tx = gx + 22 + pr * 2 + 20, tw = gx + gw - 22 - tx;
+      var ty = gy + 24;
       ctx.fillStyle = GOLD; ctx.font = 'bold 11.5px ' + SERIF; spaced(ctx, 'KÍNH MỜI', tx, ty + 8, 3, 'left');
       var nm = ((g.xh && g.xh !== 'Quý khách' ? g.xh + ' ' : '') + (g.name || '(Họ tên khách)')).trim();
       var fs = 27; ctx.font = 'bold ' + fs + 'px ' + SERIF; while (ctx.measureText(nm).width > tw && fs > 17) { fs -= 1; ctx.font = 'bold ' + fs + 'px ' + SERIF; }
@@ -359,49 +406,34 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
       if (g.lv) { ctx.fillStyle = '#55607a'; ctx.font = 'italic 13.5px ' + SERIF; ctx.fillText(wrap(ctx, 'Lĩnh vực: ' + g.lv, tw)[0], tx, ty + 12); ty += 20; }
       if (g.nm) {
         var bt = 'Người mời: ' + g.nm; ctx.font = 'bold 12.5px ' + SERIF;
-        var bw = Math.min(tw, ctx.measureText(bt).width + 20);
-        var by = Math.min(ty + 4, gy + gh - 40);
-        ctx.fillStyle = NAVY; ctx.fillRect(tx, by, bw, 24); ctx.strokeStyle = GOLD; ctx.lineWidth = 1; ctx.strokeRect(tx + .5, by + .5, bw - 1, 23);
-        ctx.fillStyle = '#fff'; ctx.fillText(bt, tx + 10, by + 16.5);
+        var bw = Math.min(tw, ctx.measureText(bt).width + 24);
+        var by = Math.min(ty + 4, gy + gh - 42);
+        rr(ctx, tx, by, bw, 26, 13); ctx.fillStyle = NAVY; ctx.fill(); ctx.strokeStyle = GOLD; ctx.lineWidth = 1; ctx.stroke();
+        ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.fillText(bt, tx + 12, by + 17.5);
       }
-      y = gy + gh + 18;
-      ctx.textAlign = 'left';
+      y = gy + gh + G;
       ctx.fillStyle = '#26324f'; ctx.font = 'italic 16px ' + SERIF; ctx.textAlign = 'center';
       ctx.fillText('Trân trọng kính mời Quý khách đến dự ' + eventPhrase(), 300, y + 18);
       ctx.fillText('để giao lưu và kết nối cùng các doanh nhân', 300, y + 18 + 26);
-      y += 52 + 18;
+      y += 51 + G;
     }
 
-    // khung thong tin
-    var rows = [
-      { k: 'cal', l: 'THỜI GIAN', v: timeLine() || '—' },
-      { k: 'pin', l: 'ĐỊA ĐIỂM', v: S.venue || '—', s: S.address }
-    ];
-    if (!khach && (S.c1 || S.c2)) rows.push({ k: 'ppl', l: 'NỘI DUNG', v: S.c1 || '—', s: S.c2 });
-    ctx.textBaseline = 'alphabetic';
-    var bx = 40, bwid = 520, by0 = y, ytmp = by0 + 6, big = !khach;
-    // do chieu cao truoc
-    var hs = rows.map(function (r) {
-      var pad = big ? 13 : 14, vf = big ? 22 : 20;
-      var h = pad * 2 + 16 + vf * 1.25;
-      if (r.s) { ctx.font = '13.5px ' + SERIF; h += 19 + (wrap(ctx, r.s, 560 - 62 - 44 - 36).length - 1) * 18; }
-      return h;
-    });
-    var total = hs.reduce(function (a, b) { return a + b; }, 0) + 12;
-    ctx.fillStyle = 'rgba(255,255,255,.78)'; ctx.fillRect(bx, by0, bwid, total);
-    ctx.strokeStyle = GOLD; ctx.lineWidth = 1.5; ctx.strokeRect(bx + .75, by0 + .75, bwid - 1.5, total - 1.5);
-    ctx.strokeStyle = 'rgba(184,137,47,.5)'; ctx.lineWidth = .8; ctx.strokeRect(bx + 3.4, by0 + 3.4, bwid - 6.8, total - 6.8);
+    // khung thong tin bo goc
+    var bx = 40, bwid = 520, by0 = y, ytmp = by0 + 6;
+    panel(ctx, bx, by0, bwid, boxH, 18, 'rgba(255,255,255,.8)');
     rows.forEach(function (r, i) {
-      var hh = item(ctx, bx + 18, ytmp, r.k, r.l, r.v, r.s, big);
+      item(ctx, bx + 18, ytmp, r.k, r.l, r.v, r.s, big);
       ytmp += hs[i];
-      if (i < rows.length - 1) { ctx.strokeStyle = 'rgba(184,137,47,.45)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(bx + 18, ytmp); ctx.lineTo(bx + bwid - 18, ytmp); ctx.stroke(); }
+      if (i < rows.length - 1) {
+        ctx.strokeStyle = 'rgba(184,137,47,.45)'; ctx.lineWidth = 1; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(bx + 24, ytmp); ctx.lineTo(bx + bwid - 24, ytmp); ctx.stroke();
+      }
     });
-    // loi cam on (can xuong day, tren thanh chan)
-    var fy = Math.max(by0 + total + 40, 760);
+    // loi cam on
     ctx.fillStyle = '#7a5a16'; ctx.font = 'italic 17px ' + SERIF; ctx.textAlign = 'center';
-    ctx.fillText(khach ? 'Rất hân hạnh được đón tiếp Quý khách!' : 'Rất mong sự hiện diện của Quý Anh/Chị!', 300, fy);
+    ctx.fillText(khach ? 'Rất hân hạnh được đón tiếp Quý khách!' : 'Rất mong sự hiện diện của Quý Anh/Chị!', 300, 772);
     ctx.fillStyle = NAVY; ctx.font = 'bold 13px ' + SERIF;
-    spaced(ctx, 'TRÂN TRỌNG', 300, fy + 26, 5, 'center');
+    spaced(ctx, 'TRÂN TRỌNG', 300, 798, 5, 'center');
   }
 
   function cur() { return S.guests[Math.min(S.cur, S.guests.length - 1)]; }
@@ -441,13 +473,13 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
     $('dlAll').textContent = '⬇ Tải tất cả (' + S.guests.length + ' thiệp, ZIP)';
     $('hint').textContent = k ? 'Mỗi khách có một thiệp độc lập (ảnh riêng, tên riêng). «Tải tất cả» nén thành 1 file ZIP, mỗi thiệp một ảnh đặt tên theo khách.'
       : 'Thư mời chung gửi toàn bộ hội viên. Ngày giờ, địa điểm, nội dung đều sửa được.';
-    $('title').value = S.title; $('date').value = S.date; $('time').value = S.time; $('venue').value = S.venue; $('address').value = S.address;
-    $('c1').value = S.c1; $('c2').value = S.c2; $('nk').value = S.nk;
+    $('title').value = S.title; $('date').value = S.date; renderSug(); $('time').value = S.time; $('venue').value = S.venue; $('address').value = S.address;
+    $('c1').value = S.c1; $('c2').value = S.c2;
     if (k) { renderGuests(); fillForm(); }
     redraw();
   }
-  function bind(id, key) { $(id).addEventListener('input', function () { S[key] = $(id).value; save(); redraw(); }); }
-  [['title', 'title'], ['date', 'date'], ['time', 'time'], ['venue', 'venue'], ['address', 'address'], ['c1', 'c1'], ['c2', 'c2'], ['nk', 'nk']].forEach(function (p) { bind(p[0], p[1]); });
+  function bind(id, key) { $(id).addEventListener('input', function () { S[key] = $(id).value; save(); redraw(); if (key === 'date') renderSug(); }); }
+  [['title', 'title'], ['date', 'date'], ['time', 'time'], ['venue', 'venue'], ['address', 'address'], ['c1', 'c1'], ['c2', 'c2']].forEach(function (p) { bind(p[0], p[1]); });
   [['gName', 'name'], ['gCd', 'cd'], ['gCt', 'ct'], ['gLv', 'lv'], ['gNm', 'nm']].forEach(function (p) {
     $(p[0]).addEventListener('input', function () { cur()[p[1]] = $(p[0]).value; save(); redraw(); if (p[1] === 'name') renderGuests(); });
   });
