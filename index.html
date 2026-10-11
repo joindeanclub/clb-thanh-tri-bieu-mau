@@ -752,7 +752,7 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
       '<button class="wbtn w2" id="goMeeting"><span class="ic">🎬</span><span class="tx"><b>Cuộc họp</b><span>Xem slide buổi họp</span></span></button>' +
       '<button class="wbtn w3" id="goInvite"><span class="ic">✉️</span><span class="tx"><b>Soạn thư mời</b><span>Thư mời chung &amp; thư mời khách</span></span></button>';
     $('goReport').onclick = openReport; $('goMeeting').onclick = openMeeting;
-    $('goInvite').onclick = function () { location.href = 'thiep-moi/'; };
+    $('goInvite').onclick = function () { location.href = 'thiep-moi/?v=' + Date.now(); };
     $('bans').innerHTML = ORDER.map(function (k) {
       var t = TILE[k];
       return '<button class="tile" data-b="' + k + '"><span class="ic">' + t.ic + '</span><b>' + t.ten + '</b><span class="note">' + t.note +

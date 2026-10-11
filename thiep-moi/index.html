@@ -54,9 +54,6 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
 #crop .r{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
 #goPre{display:none;position:fixed;right:14px;bottom:18px;z-index:15;border:0;border-radius:26px;padding:13px 18px;font:inherit;font-weight:800;color:#fff;background:linear-gradient(120deg,#0d2150,#1c4fb0);box-shadow:0 8px 20px rgba(8,18,50,.4)}
 @media(max-width:900px){#goPre{display:block}}
-.sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.sug button{border:1.5px solid #bccae3;background:#f6f9ff;color:var(--navy);border-radius:999px;padding:6px 12px;font:inherit;font-weight:700;font-size:12.5px;cursor:pointer;text-align:left}
-.sug button:hover{border-color:var(--navy2);background:#eaf0ff}
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 20px;border-radius:24px;font-weight:700;display:none;z-index:30}
 </style>
 </head>
@@ -197,23 +194,6 @@ h2{margin:0 0 4px;font-size:20px;color:var(--navy)}
   function sessionNo() {
     var m = /^(\d{4})-(\d{2})/.exec(S.date || ''); if (!m) return 46;
     return 45 + (Number(m[1]) - 2026) * 12 + (Number(m[2]) - 9);
-  }
-  function suggestions() {
-    var n = sessionNo(), m = /^(\d{4})-(\d{2})/.exec(S.date || ''), mo = m ? Number(m[2]) : (new Date().getMonth() + 1);
-    return [
-      'HỌP ĐỊNH KỲ · BUỔI ' + n,
-      'MATCHING OFFLINE ' + n,
-      'GIAO LƯU & KẾT NỐI DOANH NHÂN · BUỔI ' + n,
-      'TALKSHOW THÁNG ' + mo + ' · BUỔI ' + n,
-      'SINH HOẠT ĐỊNH KỲ THÁNG ' + mo + ' · BUỔI ' + n
-    ];
-  }
-  function renderSug() {
-    var box = $('sug'); if (!box) return;
-    box.innerHTML = suggestions().map(function (t, i) { return '<button type="button" data-i="' + i + '">' + t + '</button>'; }).join('');
-    [].forEach.call(box.querySelectorAll('button'), function (b) {
-      b.onclick = function () { S.title = suggestions()[Number(b.getAttribute('data-i'))]; $('title').value = S.title; save(); redraw(); };
-    });
   }
   function wrap(ctx, text, maxW) {
     var words = String(text || '').split(/\s+/), lines = [], cur = '';
