@@ -308,6 +308,9 @@ h2{font-weight:800;letter-spacing:-.2px}
   .tile::after{right:12px;top:14px;font-size:22px}
   .wide{margin-top:12px;gap:10px}
 }
+/* Nut sua muc da nhap */
+.it .bt{display:flex;gap:6px;flex:none}
+.it .ed{background:#e4effb;color:#0b2559}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -429,6 +432,9 @@ h2{font-weight:800;letter-spacing:-.2px}
     submit: function (ban, kind, d) {
       return withTimeout(post({ action: 'submit', ban: ban, kind: kind, data: d }), 90000).catch(function (e) { throw new Error(friendly(e)); });
     },
+    update: function (ban, kind, id, d) {
+      return withTimeout(post({ action: 'update', ban: ban, kind: kind, id: id, data: d }), 90000).catch(function (e) { throw new Error(friendly(e)); });
+    },
     remove: function (ban, tab, id) {
       return withTimeout(post({ action: 'remove', ban: ban, tab: tab, id: id }), 30000).catch(function (e) { throw new Error(friendly(e)); });
     }
@@ -449,7 +455,7 @@ h2{font-weight:800;letter-spacing:-.2px}
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
-  var ctx, me = null, ban = null, kind = null, photo = '';
+  var ctx, me = null, ban = null, kind = null, photo = '', editing = null, editPhoto = '', RECENT = {};
   var BAN = {
     thanhvien:   { icon: '🧑‍💼', desc: 'Nhập thông tin thành viên mới dự kiến kết nạp tháng tới.', kind: 'hoiVien' },
     truyenthong: { icon: '📣', desc: 'Nhập thông tin các sự kiện sắp diễn ra của CLB.', kind: 'suKien' },
@@ -503,7 +509,8 @@ h2{font-weight:800;letter-spacing:-.2px}
         { id: 'chucDanh', l: 'Chức danh / Doanh nghiệp', ph: 'Ví dụ: Giám đốc Công ty XYZ' } ] },
       { t: 'Bài chia sẻ', f: [
         { id: 'chuDe', l: 'Chủ đề chia sẻ', req: 1, ph: 'Tên bài chia sẻ' },
-        { id: 'noiDung', l: 'Tóm tắt nội dung', area: 1 } ] },
+        { id: 'noiDung', l: 'Tóm tắt nội dung', area: 1 },
+        { id: 'linkBai', l: 'Link bài đào tạo (Google Slides / Drive)', ph: 'Dán link bài trình bày vào đây', hint: 'Mở bài trên Google Slides → Chia sẻ → «Bất kỳ ai có đường liên kết» → Sao chép đường liên kết.' } ] },
       { t: 'Ảnh đại diện', photo: 1 }
     ],
     taiChinh: [
@@ -523,7 +530,8 @@ h2{font-weight:800;letter-spacing:-.2px}
       { t: 'Nội dung giới thiệu', f: [
         { id: 'gioiThieu', l: 'Giới thiệu tổng quan - Triết lý kinh doanh', area: 1 },
         { id: 'sanPham', l: 'Sản phẩm dịch vụ cung cấp - Lợi thế cạnh tranh', area: 1 },
-        { id: 'khachHang', l: 'Chân dung khách hàng mục tiêu - Chương trình bán hàng', area: 1 } ] },
+        { id: 'khachHang', l: 'Chân dung khách hàng mục tiêu - Chương trình bán hàng', area: 1 },
+        { id: 'linkBai', l: 'Link bài giới thiệu doanh nghiệp (Google Slides / Drive)', ph: 'Dán link bài trình bày vào đây', hint: 'Mở bài trên Google Slides → Chia sẻ → «Bất kỳ ai có đường liên kết» → Sao chép đường liên kết.' } ] },
       { t: 'Ảnh đại diện', photo: 1 }
     ]
   };
@@ -545,6 +553,7 @@ h2{font-weight:800;letter-spacing:-.2px}
 
   function draftKey() { return 'clb-draft-' + kind; }
   function saveDraft() {
+    if (editing) return;
     var d = {}; allFields().forEach(function (f) { d[f.id] = $(f.id).value; });
     try { localStorage.setItem(draftKey(), JSON.stringify(d)); } catch (e) {}
   }
@@ -562,7 +571,7 @@ h2{font-weight:800;letter-spacing:-.2px}
   function val(id) { return $(id) ? $(id).value.trim() : ''; }
   function preview() {
     var h = '<small>XEM TRƯỚC TRÊN SLIDE</small>';
-    var pv = '<div class="pv">' + (photo ? '<img src="' + photo + '">' : 'Ảnh chân dung') + '</div>';
+    var pv = '<div class="pv">' + ((photo || editPhoto) ? '<img src="' + (photo || editPhoto) + '">' : 'Ảnh chân dung') + '</div>';
     if (kind === 'hoiVien') {
       h += pv + '<b>' + esc((val('hoTen') || 'HỌ VÀ TÊN').toUpperCase()) + '</b><div class="l">' + esc(val('congTy') || 'Tên công ty') + '</div>' +
         '<div class="l">' + esc(val('nganhNghe') || 'Ngành nghề') + '</div><div class="l">' + esc(val('diaChi') || 'Địa chỉ') + '</div>' +
@@ -585,7 +594,7 @@ h2{font-weight:800;letter-spacing:-.2px}
 
   // ----- Dung giao dien -----
   function openBan(b) {
-    ban = b; kind = BAN[b].kind;
+    ban = b; kind = BAN[b].kind; editing = null;
     $('home').classList.add('hide'); $('done').classList.add('hide'); $('work').classList.remove('hide');
     $('crumb').textContent = TILE[b] ? TILE[b].ten : '';
     render(); loadRecent(); window.scrollTo(0, 0);
@@ -620,7 +629,7 @@ h2{font-weight:800;letter-spacing:-.2px}
     });
     html += '<div style="margin-top:22px"><button class="btn big" id="send">✔ Gửi thông tin</button><div class="draft" id="draftNote"></div></div>';
     $('form').innerHTML = html;
-    [].forEach.call($('tabs').querySelectorAll('button'), function (b) { b.onclick = function () { kind = b.getAttribute('data-k'); render(); }; });
+    [].forEach.call($('tabs').querySelectorAll('button'), function (b) { b.onclick = function () { kind = b.getAttribute('data-k'); editing = null; render(); }; });
     if ($('pickPhoto')) $('pickPhoto').onclick = pickPhoto;
     if (kind === 'taiChinh') initLists();
     if ($('saveCnt')) {
@@ -640,13 +649,48 @@ h2{font-weight:800;letter-spacing:-.2px}
       };
     }
     $('send').onclick = send;
-    if (loadDraft()) $('draftNote').textContent = 'Đã khôi phục bản nháp bạn nhập dở.';
+    if (!editing && loadDraft()) $('draftNote').textContent = 'Đã khôi phục bản nháp bạn nhập dở.';
     allFields().forEach(function (f) {
       var el = $(f.id);
       el.addEventListener('input', function () { $('f_' + f.id).classList.remove('bad'); saveDraft(); preview(); });
       el.addEventListener('change', function () { preview(); });
     });
+    if (editing) applyEdit();
     preview();
+  }
+
+  // ----- Sua muc da nhap -----
+  var KIND_OF = { HoiVien: 'hoiVien', SuKien: 'suKien', DienGia: 'dienGia', Showcase: 'showcase', TaiChinh: 'taiChinh' };
+  function startEdit(id) {
+    var r = RECENT[id]; if (!r || !KIND_OF[r.tab]) return;
+    editing = { id: id, tab: r.tab, row: r.x }; kind = KIND_OF[r.tab];
+    render(); window.scrollTo(0, 0);
+  }
+  function applyEdit() {
+    var x = editing.row;
+    allFields().forEach(function (f) {
+      var el = $(f.id); if (!el || x[f.id] == null) return;
+      var v = String(x[f.id]);
+      if (f.type === 'month' && ![].some.call(el.options, function (o) { return o.value === v; })) {
+        var o = document.createElement('option'); o.value = v; o.textContent = monthLabel(v); el.insertBefore(o, el.firstChild);
+      }
+      if (f.id === 'dauKy') v = (Number(v) || 0).toLocaleString('vi-VN');
+      el.value = v;
+    });
+    if (kind === 'taiChinh') {
+      var pj = function (t) { try { return JSON.parse(t || '[]').map(function (r) { return { ten: r.ten, so: (Number(r.so) || 0).toLocaleString('vi-VN') }; }); } catch (e) { return []; } };
+      rows.thu = pj(x.thu); rows.chi = pj(x.chi);
+      if (!rows.thu.length) rows.thu = [{ ten: '', so: '' }];
+      if (!rows.chi.length) rows.chi = [{ ten: '', so: '' }];
+      drawList('thu'); drawList('chi'); totals();
+    }
+    editPhoto = x.anhId ? 'https://lh3.googleusercontent.com/d/' + encodeURIComponent(x.anhId) + '=w300' : '';
+    if ($('pvMain') && editPhoto) $('pvMain').innerHTML = '<img src="' + editPhoto + '">';
+    var title = x.hoTen || x.tenSuKien || 'báo cáo tài chính';
+    $('msg').innerHTML = '<div class="msg" style="background:#e8f0fc;color:#0b2559">✏️ Đang sửa: <b>' + esc(title) + '</b> · <a href="#" id="cancelEdit">Hủy sửa</a></div>';
+    $('cancelEdit').onclick = function (e) { e.preventDefault(); editing = null; editPhoto = ''; render(); };
+    $('send').textContent = '✔ Lưu thay đổi';
+    var dn = $('draftNote'); if (dn) dn.textContent = 'Ảnh cũ được giữ nguyên nếu bạn không chọn ảnh mới.';
   }
   var rows = { thu: [], chi: [] };
   function money(v) { var n = String(v == null ? '' : v).replace(/[^0-9]/g, ''); return n ? Number(n) : 0; }
@@ -701,18 +745,22 @@ h2{font-weight:800;letter-spacing:-.2px}
       d.chi = rows.chi.map(function (r) { return { ten: r.ten, so: money(r.so) }; }).filter(function (r) { return r.ten.trim(); });
     }
     if (HAS_PHOTO()) d.photo = photo;
-    var btn = $('send'); btn.disabled = true; btn.textContent = 'Đang gửi… vui lòng chờ';
-    google.script.run.withSuccessHandler(function () {
-      clearDraft(); if (window.__markUpd) window.__markUpd(ban); done();
+    var btn = $('send'), wasEdit = !!editing, editId = wasEdit ? editing.id : '';
+    btn.disabled = true; btn.textContent = wasEdit ? 'Đang lưu… vui lòng chờ' : 'Đang gửi… vui lòng chờ';
+    var run = google.script.run.withSuccessHandler(function () {
+      if (!wasEdit) clearDraft();
+      editing = null; editPhoto = ''; if (window.__markUpd) window.__markUpd(ban); done(wasEdit);
     }).withFailureHandler(function (e) {
-      btn.disabled = false; btn.textContent = '✔ Gửi thông tin';
-      $('msg').innerHTML = '<div class="msg err">' + esc(String(e.message || e).replace(/^Error: /, '')) + '</div>';
+      btn.disabled = false; btn.textContent = wasEdit ? '✔ Lưu thay đổi' : '✔ Gửi thông tin';
+      var m = $('msg'), keep = wasEdit ? m.innerHTML : '';
+      m.innerHTML = keep + '<div class="msg err">' + esc(String(e.message || e).replace(/^Error: /, '')) + '</div>';
       window.scrollTo(0, 0);
-    }).submit(ban, kind, d);
+    });
+    if (wasEdit) run.update(ban, kind, editId, d); else run.submit(ban, kind, d);
   }
-  function done() {
+  function done(wasEdit) {
     $('work').classList.add('hide'); $('done').classList.remove('hide');
-    $('done').innerHTML = '<div class="done"><div class="ck">✓</div><h1>Đã gửi thành công!</h1>' +
+    $('done').innerHTML = '<div class="done"><div class="ck">✓</div><h1>' + (wasEdit ? 'Đã lưu thay đổi!' : 'Đã gửi thành công!') + '</h1>' +
       '<p class="sub">Thông tin của bạn sẽ tự động cập nhật lên slide CLB trong ít phút.</p>' +
       '<div class="row2"><button class="btn" id="more">+ Nhập thêm</button><button class="btn sec2" id="home2">← Về trang chọn ban</button></div></div>';
     $('more').onclick = function () { $('done').classList.add('hide'); $('work').classList.remove('hide'); render(); loadRecent(); window.scrollTo(0, 0); };
@@ -724,9 +772,10 @@ h2{font-weight:800;letter-spacing:-.2px}
   function loadRecent() {
     $('recent').innerHTML = '<p class="help">Đang tải…</p>';
     google.script.run.withSuccessHandler(function (r) {
-      var h = '';
+      var h = ''; RECENT = {};
       Object.keys(r).forEach(function (tab) {
         r[tab].forEach(function (x) {
+          RECENT[x.id] = { tab: tab, x: x };
           var title = x.hoTen || x.tenSuKien || (tab === 'TaiChinh' ? 'Báo cáo tài chính' : '') || (tab === 'SoThanhVien' ? 'Tổng số thành viên: ' + x.soLuong : '');
           var sub = x.congTy || x.doanhNghiep || x.chuDe || fmtDate(x.ngay) || '';
           if (tab === 'TaiChinh') {
@@ -738,12 +787,13 @@ h2{font-weight:800;letter-spacing:-.2px}
             sub = 'Thu ' + st.toLocaleString('vi-VN') + ' đ · Chi ' + sc.toLocaleString('vi-VN') + ' đ';
           }
           h += '<div class="it"><div><b>' + esc(title) + '</b><span>' + esc(TABNAME[tab]) + (x.thang ? ' · ' + esc(monthLabel(x.thang)) : '') +
-            (sub ? ' · ' + esc(sub) : '') + '</span></div><button data-tab="' + tab + '" data-id="' + esc(x.id) + '">Xóa</button></div>';
+            (sub ? ' · ' + esc(sub) : '') + '</span></div><div class="bt">' + (KIND_OF[tab] ? '<button class="ed" data-ed="' + esc(x.id) + '">Sửa</button>' : '') + '<button data-tab="' + tab + '" data-id="' + esc(x.id) + '">Xóa</button></div></div>';
         });
       });
       if (r.SoThanhVien && r.SoThanhVien[0] && $('soTV') && !$('soTV').value) $('soTV').value = r.SoThanhVien[0].soLuong;
       $('recent').innerHTML = h || '<p class="help">Chưa có mục nào.</p>';
-      [].forEach.call($('recent').querySelectorAll('button'), function (b) {
+      [].forEach.call($('recent').querySelectorAll('button[data-ed]'), function (b) { b.onclick = function () { startEdit(b.getAttribute('data-ed')); }; });
+      [].forEach.call($('recent').querySelectorAll('button[data-tab]'), function (b) {
         b.onclick = function () {
           if (!confirm('Xóa mục này?')) return;
           google.script.run.withSuccessHandler(loadRecent).withFailureHandler(function (e) { alert(e.message || e); })
