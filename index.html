@@ -309,6 +309,7 @@ h2{font-weight:800;letter-spacing:-.2px}
   .wide{margin-top:12px;gap:10px}
 }
 /* Nut sua muc da nhap */
+.it .ts{display:block;color:#1760c4;font-weight:600;margin-top:2px}
 .it .bt{display:flex;gap:6px;flex:none}
 .it .ed{background:#e4effb;color:#0b2559}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -340,7 +341,7 @@ h2{font-weight:800;letter-spacing:-.2px}
         <p class="help" style="margin-top:10px;text-align:center">Đây là cách thông tin sẽ hiển thị trên slide CLB.</p>
       </div>
     </div>
-    <div class="card recent"><h3>Các mục đã nhập gần đây</h3><div id="recent"></div></div>
+    <div class="card recent"><h3>Các mục đã nhập (mới nhất ở trên)</h3><div id="recent"></div></div>
   </section>
 
   <section id="done" class="hide card"></section>
@@ -769,6 +770,10 @@ h2{font-weight:800;letter-spacing:-.2px}
   }
   
 
+  function fmtTs(v) {
+    var m = String(v || '').match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/);
+    return m ? m[3] + '/' + m[2] + '/' + m[1] + (m[4] ? ' · ' + m[4] + 'h' + m[5] : '') : '(không rõ)';
+  }
   function loadRecent() {
     $('recent').innerHTML = '<p class="help">Đang tải…</p>';
     google.script.run.withSuccessHandler(function (r) {
@@ -787,7 +792,7 @@ h2{font-weight:800;letter-spacing:-.2px}
             sub = 'Thu ' + st.toLocaleString('vi-VN') + ' đ · Chi ' + sc.toLocaleString('vi-VN') + ' đ';
           }
           h += '<div class="it"><div><b>' + esc(title) + '</b><span>' + esc(TABNAME[tab]) + (x.thang ? ' · ' + esc(monthLabel(x.thang)) : '') +
-            (sub ? ' · ' + esc(sub) : '') + '</span></div><div class="bt">' + (KIND_OF[tab] ? '<button class="ed" data-ed="' + esc(x.id) + '">Sửa</button>' : '') + '<button data-tab="' + tab + '" data-id="' + esc(x.id) + '">Xóa</button></div></div>';
+            (sub ? ' · ' + esc(sub) : '') + '</span><span class="ts">🕒 Nhập lúc ' + esc(fmtTs(x.thoiGian)) + '</span></div><div class="bt">' + (KIND_OF[tab] ? '<button class="ed" data-ed="' + esc(x.id) + '">Sửa</button>' : '') + '<button data-tab="' + tab + '" data-id="' + esc(x.id) + '">Xóa</button></div></div>';
         });
       });
       if (r.SoThanhVien && r.SoThanhVien[0] && $('soTV') && !$('soTV').value) $('soTV').value = r.SoThanhVien[0].soLuong;
