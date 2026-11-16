@@ -1,0 +1,203 @@
+{
+ "settings": {
+  "clubName": "CLB DOANH NGHIỆP THANH TRÌ",
+  "eventName": "MATCHING OFFLINE",
+  "baseYear": 2026,
+  "baseMonth": 9,
+  "baseNumber": 45,
+  "tagline": "Nơi các chủ doanh nghiệp hội tụ, chia sẻ tài nguyên, quảng bá năng lực cốt lõi và tìm kiếm đối tác chiến lược để cùng bứt phá dòng tiền bền vững."
+ },
+ "fixed": {
+  "tenNhiemKy": "Nhiệm kỳ VII",
+  "bdh": [
+   {
+    "ten": "MR HỒ XUÂN THÀNH",
+    "vaiTro": "PHÓ CHỦ TỊCH",
+    "anh": "assets/face/ho-xuan-thanh.jpg"
+   },
+   {
+    "ten": "MR PHẠM VĂN THÀNH",
+    "vaiTro": "CHỦ TỊCH",
+    "anh": "assets/face/pham-van-thanh.jpg"
+   },
+   {
+    "ten": "MS NGUYỄN THU TRANG",
+    "vaiTro": "TỔNG THƯ KÝ",
+    "anh": "assets/face/nguyen-thu-trang.jpg"
+   },
+   {
+    "ten": "MS LÊ NGỌC DUYÊN",
+    "vaiTro": "TB THÀNH VIÊN",
+    "anh": "assets/face/le-ngoc-duyen.jpg"
+   },
+   {
+    "ten": "MR NGUYỄN ĐỨC CÔNG",
+    "vaiTro": "TB TRUYỀN THÔNG & SỰ KIỆN",
+    "anh": "assets/face/nguyen-duc-cong.jpg"
+   },
+   {
+    "ten": "MR NGUYỄN THANH TÙNG",
+    "vaiTro": "TB KHÁCH MỜI",
+    "anh": "assets/face/nguyen-thanh-tung.jpg"
+   },
+   {
+    "ten": "MS NGUYỄN PHI NGA",
+    "vaiTro": "TB ĐÀO TẠO",
+    "anh": "assets/face/nguyen-phi-nga.jpg"
+   }
+  ],
+  "chuTichTienNhiem": [
+   {
+    "ten": "MR THỊNH VĂN TÂN",
+    "moTa": "Khởi tạo nền móng, định hình sứ mệnh và kết nối những hội viên sáng lập đầu tiên.",
+    "anh": "assets/face/thinh-van-tan.jpg"
+   },
+   {
+    "ten": "MR NGUYỄN THÀNH LONG",
+    "moTa": "Mở rộng quy mô, chuẩn hóa quy trình sinh hoạt nội bộ và gia tăng cơ hội giao thương.",
+    "anh": "assets/face/nguyen-thanh-long.jpg"
+   },
+   {
+    "ten": "MR ĐỖ MẠNH THÀNH",
+    "moTa": "Kiến tạo giải pháp công nghệ hỗ trợ hội viên số hóa, nâng tầm hiệu suất hoạt động CLB.",
+    "anh": "assets/face/do-manh-thanh.jpg"
+   },
+   {
+    "ten": "MS DOÃN HOA",
+    "moTa": "Phát triển văn hóa chia sẻ, thúc đẩy nâng cao năng lực nữ doanh nhân và trách nhiệm xã hội.",
+    "anh": "assets/face/doan-hoa.jpg"
+   }
+  ],
+  "nguoiTrinhBay": {
+   "bia": "MR NGUYỄN ĐỨC CÔNG",
+   "bdh": "MR PHẠM VĂN THÀNH",
+   "lichSu": "MR PHẠM VĂN THÀNH",
+   "triAn": "MR PHẠM VĂN THÀNH",
+   "giaTri": "MR PHẠM VĂN THÀNH",
+   "loiIch": "MR PHẠM VĂN THÀNH",
+   "chuDe": "MS NGUYỄN PHI NGA",
+   "dienGia": "MS NGUYỄN PHI NGA",
+   "hoiVienMoi": "MR HỒ XUÂN THÀNH",
+   "gioiThieu30s": "MS NGUYỄN PHI NGA",
+   "khachMoi": "MS NGUYỄN PHI NGA",
+   "showcase": "MS NGUYỄN PHI NGA",
+   "coHoi": "MR HỒ XUÂN THÀNH",
+   "thuKy": "MS NGUYỄN THU TRANG",
+   "taiChinh": "MS NGUYỄN THU TRANG",
+   "suKien": "MR NGUYỄN ĐỨC CÔNG",
+   "bocTham": "MR NGUYỄN ĐỨC CÔNG",
+   "camOn": "MR PHẠM VĂN THÀNH"
+  },
+  "suKien": [
+   {
+    "ten": "HỌP ĐỊNH KỲ",
+    "moTa": "Sinh hoạt định kỳ CLB kết nối giao thương trực tiếp giữa các hội viên, chia sẻ giải pháp quản trị doanh nghiệp."
+   },
+   {
+    "ten": "TALKSHOW THÁNG",
+    "moTa": "Sự kiện chia sẻ chuyên sâu từ chuyên gia về xu hướng thị trường, bứt phá dòng tiền và quản trị rủi ro tối ưu."
+   },
+   {
+    "ten": "BUSINESS TOUR",
+    "moTa": "Chương trình tham quan trực tiếp nhà máy, văn phòng doanh nghiệp hội viên để hiểu sâu, tin tưởng và trao referral."
+   }
+  ]
+ },
+ "months": {
+  "2026-09": {
+   "chuDe": {
+    "tieuDe": "CHỦ ĐỀ CHIA SẺ HÔM NAY",
+    "moTa": "Nền tảng thảo luận cởi mở giữa các hội viên, chia sẻ kinh nghiệm thực chiến và kiến tạo cơ hội hợp tác đa phương trong giai đoạn mới."
+   },
+   "dienGia": {
+    "ten": "",
+    "chucDanh": "",
+    "noiDung": "",
+    "anh": ""
+   },
+   "hoiVienMoi": [
+    {
+     "ten": "VŨ THỊ THÚY",
+     "dn": "HỘ KINH DOANH THÚY LINH",
+     "nganh": "Dưỡng sinh đông y",
+     "diaChi": "Thanh Trì, HN",
+     "triLy": "",
+     "anh": "assets/face/vu-thi-thuy.jpg"
+    },
+    {
+     "ten": "ĐẶNG THỊ MINH HOA",
+     "dn": "HỘ KINH DOANH HOAMI SPA",
+     "nganh": "Chăm sóc sức khỏe và sắc đẹp",
+     "diaChi": "Thanh Trì, HN",
+     "triLy": "",
+     "anh": "assets/face/dang-minh-hoa.jpg"
+    },
+    {
+     "ten": "DƯƠNG MINH HUY",
+     "dn": "CÔNG TY TNHH ĐẦU TƯ PHÁT TRIỂN HUY PHÁT",
+     "nganh": "Dầu nhớt, dầu thủy lực",
+     "diaChi": "Đông Anh",
+     "triLy": "",
+     "anh": "assets/face/duong-minh-huy.jpg"
+    }
+   ],
+   "khachMoi": [],
+   "showcase": {
+    "ten": "MS ĐẶNG HIỀN NGHĨA",
+    "dn": "VinaLink Group (Công ty Cổ phần Tập đoàn Liên kết Việt Nam)",
+    "gioiThieu": "",
+    "sanPham": "",
+    "khachHang": "",
+    "anh": "assets/face/dang-hien-nghia.jpg"
+   },
+   "taiChinh": {
+    "dauKy": 59089728,
+    "thu": [
+     {
+      "ten": "Các khoản thu tháng 8/2026 (chi tiết cập nhật sau)",
+      "so": 31200000,
+      "ghiChu": ""
+     }
+    ],
+    "chi": [
+     {
+      "ten": "Các khoản chi tháng 8/2026 (chi tiết cập nhật sau)",
+      "so": 8730000,
+      "ghiChu": ""
+     }
+    ],
+    "ghiChu": ""
+   },
+   "coHoi": {
+    "referral": "",
+    "closed": ""
+   },
+   "bocTham": {
+    "giaiThuong": "",
+    "danhSach": ""
+   },
+   "thuKy": {
+    "vanHanh": "",
+    "chiSo": ""
+   }
+  },
+  "2026-10": {
+   "dienGia": {
+    "ten": "Nguyễn Thanh Tùng",
+    "chucDanh": "CÔNG TY CP CÔNG NGHỆ NÔNG NGHIỆP LITECH",
+    "noiDung": "",
+    "anh": "uploads/mv2miy5w-chan-dung.jpg"
+   },
+   "chuDe": {
+    "tieuDe": "Who is in your room? ",
+    "moTa": "Hãy tưởng tượng… bạn sống cả đời trong 1 căn phòng, và căn phòng đó chỉ có 1 cánh cửa, và cánh cửa đó chỉ có thể vào được, vậy nên khi có ai đó bước vào cuộc đời bạn… họ sẽ ở đó mãi mãi.\n"
+   },
+   "hoiVienMoi": [],
+   "khachMoi": [],
+   "taiChinh": {
+    "thu": [],
+    "chi": []
+   }
+  }
+ }
+}

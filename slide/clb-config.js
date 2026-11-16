@@ -1,0 +1,1 @@
+window.CLB_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbxveSm-CEVT8AJoXJro6GXvJ7vQpngu0M9oN7EiEQHRm65ZH3w1FQcIJ-71EVtdgYz-/exec","token":"f47d555fdeb34b87944fd4ee40e1db40b2429e3d","baseUrl":"base.json","formUrl":"https://joindeanclub.github.io/clb-thanh-tri-bieu-mau/"};

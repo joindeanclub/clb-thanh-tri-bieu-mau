@@ -227,6 +227,88 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
   .done .ck { width: 70px; height: 70px; font-size: 40px; }
   #crop .box { padding: 16px; }
 }
+
+/* ============================================================
+   THIẾT KẾ LẠI 16/11/2026 — phẳng, thoáng, hiện đại (giữ xanh navy)
+   Lớp ghi đè; không đổi cấu trúc HTML/JS.
+   ============================================================ */
+:root{--navy:#0b2559;--blue:#1760c4;--teal:#0f9d94;--gold:#d99a14;--ink:#0f1b33;--mute:#5b6a86;--line:#e1e8f4;--bg:#f5f8fd;--green:#0f8a57;--red:#c9302c;--r:16px;--sh:0 1px 2px rgba(11,37,89,.06),0 8px 24px rgba(11,37,89,.07)}
+body{background:radial-gradient(1200px 420px at 50% -120px,#dfeafb 0%,transparent 70%) no-repeat,var(--bg);font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+header{background:rgba(11,37,89,.96);backdrop-filter:blur(8px);padding:10px 20px;box-shadow:0 1px 0 rgba(255,255,255,.06),0 6px 20px rgba(11,37,89,.25)}
+header img{height:40px;border-radius:50%;padding:3px;background:#fff}
+header .t b{font-size:17px;font-weight:700;letter-spacing:.2px}
+main{max-width:760px;padding:26px 16px 64px}
+.card{border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh)}
+h1{font-size:28px;font-weight:800;letter-spacing:-.3px}
+h2{font-weight:800;letter-spacing:-.2px}
+.hello{margin:4px 0 22px}
+.hello .sub{font-size:16px;margin:0}
+
+/* Ô ban: thẻ phẳng, biểu tượng nền nhạt, chữ canh trái */
+.tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:none}
+.tile{aspect-ratio:auto;min-height:168px;align-items:flex-start;text-align:left;gap:4px;padding:18px 18px 16px;border-radius:var(--r);background:#fff;border:1px solid var(--line);box-shadow:var(--sh);transition:transform .18s,box-shadow .18s,border-color .18s;position:relative}
+.tile:hover{transform:translateY(-3px);border-color:#b9cdee;box-shadow:0 2px 4px rgba(11,37,89,.06),0 16px 34px rgba(23,96,196,.16)}
+.tile:active{transform:scale(.985);box-shadow:var(--sh)}
+.tile .ic{width:52px;height:52px;border-radius:14px;background:#e8f0fc;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:10px}
+.tile b{font-size:18px;font-weight:800;letter-spacing:-.1px}
+.tile .note{font-size:14px;color:var(--mute)}
+.tile::after{content:"›";position:absolute;right:16px;top:18px;font-size:26px;line-height:1;color:#a9b8d4;font-weight:300;transition:transform .18s,color .18s}
+.tile:hover::after{transform:translateX(3px);color:var(--blue)}
+.tile .upd{display:inline-block;margin-top:auto;padding:4px 10px;border-radius:20px;background:#eef2f9;font-size:12px;font-weight:700;color:#6b7a90;text-shadow:none;animation:none}
+.tile .upd.on{background:#e3f6ec;color:#0a7a44;text-shadow:none;animation:none}
+@media(min-width:701px){.tile .ic{font-size:30px}.tile b{font-size:19px}.tile .note{font-size:14.5px}.tile .upd{font-size:12.5px}}
+
+/* Ba nút rộng: thẻ trắng + vạch màu bên trái */
+.wide{max-width:none;margin:18px 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.wbtn{color:var(--ink);background:#fff;border:1px solid var(--line);border-left:5px solid var(--navy);border-radius:var(--r);box-shadow:var(--sh);padding:14px 16px;transition:transform .18s,box-shadow .18s}
+.wbtn:hover{transform:translateY(-3px);box-shadow:0 2px 4px rgba(11,37,89,.06),0 16px 34px rgba(11,37,89,.14)}
+.wbtn:active{transform:scale(.985);box-shadow:var(--sh)}
+.wbtn .ic{width:46px;height:46px;border-radius:12px;font-size:24px;background:#e8f0fc}
+.wbtn .tx b{font-size:16px;font-weight:800;color:var(--navy)}
+.wbtn .tx span{font-size:13px;opacity:1;color:var(--mute)}
+.w4{background:#fff;border-left-color:#c9302c}.w4 .ic{background:#fdeaec}.w1{background:#fff;border-left-color:#1760c4}.w2{background:#fff;border-left-color:#d99a14}.w3{background:#fff;border-left-color:#0f9d94}
+.w2 .ic{background:#fdf1d6}.w3 .ic{background:#dcf4f1}
+@media(max-width:900px){.wide{grid-template-columns:1fr}}
+@media(min-width:901px){.wide{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Form */
+.top{margin-bottom:16px}
+.back{border:1px solid var(--line);border-radius:999px;padding:9px 16px;box-shadow:0 1px 2px rgba(11,37,89,.06);transition:background .15s}
+.back:hover{background:#eef4fd}
+.crumb{font-size:18px;font-weight:800}
+.tabs{background:#e9eff9;border-radius:999px;padding:5px}
+.tabs button{border-radius:999px;transition:background .15s,color .15s}
+.tabs button.on{box-shadow:0 2px 8px rgba(11,37,89,.14)}
+.sec h3 i{background:var(--blue)}
+.f>label{font-size:14.5px;color:#22304d}
+.f input,.f select,.f textarea,.lrow input,.cnt-r input,.sel2 select{border:1.5px solid #cfdaee;border-radius:12px;background:#fbfdff}
+.f input:focus,.f select:focus,.f textarea:focus,.lrow input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(23,96,196,.14)}
+.btn{border-radius:12px;background:var(--blue);transition:filter .15s,transform .1s}
+.btn:hover:not(:disabled){filter:brightness(1.07)}
+.btn:active:not(:disabled){transform:scale(.98)}
+.btn.big{background:linear-gradient(120deg,#0f8a57,#13a96b);box-shadow:0 8px 20px rgba(15,138,87,.28)}
+.pre{background:#fff;border:1.5px dashed #b9c9e4;border-radius:var(--r)}
+.pv{box-shadow:0 0 0 3px var(--blue),0 8px 20px rgba(11,37,89,.18)}
+.it{border-top:1px solid var(--line)}
+.chip.on{background:var(--blue);border-color:var(--blue)}
+.k2{border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh)}
+.k2.big{background:linear-gradient(120deg,#0b2559,#16419a);border-color:#0b2559}
+.li2{border:1px solid var(--line);border-radius:14px}
+.slw{border-radius:14px}
+.ctrl2 .a{background:var(--navy);border-radius:12px}
+
+@media(max-width:700px){
+  main{padding:16px 12px 44px}
+  h1{font-size:23px}
+  .tiles{gap:10px}
+  .tile{min-height:150px;padding:14px 14px 12px}
+  .tile .ic{width:44px;height:44px;font-size:24px;margin-bottom:8px}
+  .tile b{font-size:16px}
+  .tile .note{font-size:13px}
+  .tile::after{right:12px;top:14px;font-size:22px}
+  .wide{margin-top:12px;gap:10px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -750,9 +832,11 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
     $('work').classList.add('hide'); $('done').classList.add('hide'); $('loading').classList.add('hide'); $('report').classList.add('hide'); $('meeting').classList.add('hide'); $('home').classList.remove('hide');
     $('wide').innerHTML = '<button class="wbtn w1" id="goReport"><span class="ic">📊</span><span class="tx"><b>Đọc báo cáo nhanh</b><span>Tóm tắt hoạt động CLB</span></span></button>' +
       '<button class="wbtn w2" id="goMeeting"><span class="ic">🎬</span><span class="tx"><b>Cuộc họp</b><span>Xem slide buổi họp</span></span></button>' +
+      '<button class="wbtn w4" id="goMissing"><span class="ic">📋</span><span class="tx"><b>Còn thiếu gì?</b><span>Mục slide cần bổ sung · tin Zalo nhắc các ban</span></span></button>' +
       '<button class="wbtn w3" id="goInvite"><span class="ic">✉️</span><span class="tx"><b>Soạn thư mời</b><span>Thư mời chung &amp; thư mời khách</span></span></button>';
     $('goReport').onclick = openReport; $('goMeeting').onclick = openMeeting;
     $('goInvite').onclick = function () { location.href = 'thiep-moi/?v=' + Date.now(); };
+    $('goMissing').onclick = function () { location.href = 'slide/?thieu=1'; };
     $('bans').innerHTML = ORDER.map(function (k) {
       var t = TILE[k];
       return '<button class="tile" data-b="' + k + '"><span class="ic">' + t.ic + '</span><b>' + t.ten + '</b><span class="note">' + t.note +
@@ -839,27 +923,11 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
   var MT = { list: [], key: '', n: 0, i: 0 };
   function openMeeting() {
     pickShow('meeting');
-    $('mtBody').innerHTML = '<div class="card"><h2>Đang tải danh sách buổi họp…</h2></div>';
-    fetch('slides/manifest.json?t=' + Date.now()).then(function (r) { if (!r.ok) throw new Error('nf'); return r.json(); }).then(function (m) {
-      MT.list = (m.months || []).slice().sort(function (a, b) { return a.key < b.key ? 1 : -1; });
-      if (!MT.list.length) throw new Error('empty');
-      $('mtBody').innerHTML = '<div class="latest" id="mtLabel"></div>' +
-        '<div class="slw" id="slw"><img id="slImg" alt=""><span class="sdtag">SD</span></div>' +
-        '<div class="ctrl2"><button class="a g" id="mtPrev">◀ Trước</button><span class="c" id="mtCnt"></span><button class="a" id="mtNext">Sau ▶</button></div>' +
-        '<div class="chips" id="mtChips"></div>' +
-        '<div class="mtrow"><button class="btn sec2" id="mtFull">⛶ Toàn màn hình</button></div>' +
-        '<p class="note2" id="mtInfo"></p>';
-      $('mtPrev').onclick = function () { gotoSlide(MT.i - 1); };
-      $('mtNext').onclick = function () { gotoSlide(MT.i + 1); };
-      $('mtFull').onclick = function () { var el = $('slw'); (el.requestFullscreen || el.webkitRequestFullscreen || function () {}).call(el); };
-      var sx = null, w = $('slw');
-      w.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
-      w.addEventListener('touchend', function (e) { if (sx == null) return; var dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) gotoSlide(MT.i + (dx < 0 ? 1 : -1)); sx = null; });
-      w.addEventListener('click', function (e) { var r = w.getBoundingClientRect(); gotoSlide(MT.i + ((e.clientX - r.left) > r.width / 2 ? 1 : -1)); });
-      loadDeck(MT.list[0].key);
-    }).catch(function () {
-      $('mtBody').innerHTML = '<div class="card"><h2>Chưa có slide nào</h2><p class="sub">Ban điều hành chưa đăng slide buổi họp lên web. Trong app trình chiếu, bấm «🌐 Đăng slide lên web».</p></div>';
-    });
+    // Slide cuoc hop chay ONLINE (doc truc tiep du lieu tu Google Sheet) — khong phu thuoc may tinh nao
+    $('mtBody').innerHTML = '<div class="latest"><span class="dot"></span> Slide cuộc họp · tự cập nhật khi các ban nhập thông tin</div>' +
+      '<div class="slw" id="slw"><iframe src="slide/" title="Slide cuộc họp" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>' +
+      '<div class="mtrow"><a class="btn" href="slide/" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">⛶ Mở toàn màn hình</a></div>' +
+      '<p class="note2">Bấm nút «📋 Còn thiếu» ở thanh dưới slide để xem mục nào còn thiếu và sao chép tin nhắn Zalo gửi các ban.</p>';
   }
   function slideUrl(i) { return 'slides/' + MT.key + '/' + p2(i + 1) + '.jpg?v=' + (MT.ver || ''); }
   function loadDeck(key) {
