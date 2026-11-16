@@ -29,6 +29,7 @@
   <span class="cnt2" id="cnt">1/1</span>
   <button id="next" title="Slide sau (→)">▶</button>
   <select id="monthSel" title="Chọn tháng"></select>
+  <button id="pptBtn" title="Tải toàn bộ slide tháng này thành file PowerPoint">📥 Xuất PowerPoint</button>
   <button id="missBtn" title="Các mục còn thiếu của slide">📋 Còn thiếu</button>
   <button id="fsBtn" title="Toàn màn hình (F)">⛶</button>
 </div>
@@ -36,6 +37,8 @@
   <h3>Các mục còn thiếu</h3><div id="missBody"></div>
   <div class="r"><button id="missClose">Đóng</button><button class="p" id="missCopy">Sao chép tin Zalo</button></div>
 </div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <script src="clb-config.js"></script>
 <script>window.CLB_ASSETS = 'assets/';</script>
 <script src="slides.js"></script>
@@ -115,6 +118,48 @@
   let tx = null;
   addEventListener('touchstart', (e) => { tx = e.touches[0].clientX; });
   addEventListener('touchend', (e) => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1)); tx = null; });
+
+  // ---- Xuat PowerPoint: moi slide chup thanh 1 anh 16:9 (giu nguyen giao dien), kem ghi chu van ban ----
+  async function buildPptx(onProg) {
+    const pptx = new PptxGenJS(); pptx.layout = 'LAYOUT_16x9';
+    pptx.title = 'Slide CLB Doanh nghiệp Thanh Trì - tháng ' + key;
+    const holder = document.createElement('div');
+    holder.style.cssText = 'position:fixed;left:-20000px;top:0;width:1920px;height:1080px;overflow:hidden;pointer-events:none';
+    document.body.appendChild(holder);
+    try {
+      for (let i = 0; i < slides.length; i++) {
+        holder.innerHTML = '<section class="slide on" style="transition:none;opacity:1">' + slides[i].html + '</section>';
+        const el = holder.firstChild, links = [];
+        el.querySelectorAll('iframe').forEach((f) => {
+          links.push(f.src);
+          const d = document.createElement('div');
+          d.style.cssText = 'width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0b2559;color:#fff;font:600 40px "Segoe UI",sans-serif;text-align:center;padding:60px';
+          d.textContent = 'Bài trình bày nhúng từ Google Slides — bấm vào liên kết bên dưới để mở';
+          f.replaceWith(d);
+        });
+        await Promise.all([...el.querySelectorAll('img')].map((im) => im.complete ? 1 : new Promise((r) => { im.onload = im.onerror = r; })));
+        const cv = await html2canvas(el, { width: 1920, height: 1080, scale: 0.7, useCORS: true, backgroundColor: '#ffffff', logging: false });
+        const sl = pptx.addSlide();
+        sl.addImage({ data: cv.toDataURL('image/jpeg', 0.88), x: 0, y: 0, w: '100%', h: '100%' });
+        if (links.length) sl.addText('Mở bài trình bày: ' + links[0], { x: 0.4, y: 5.05, w: 9.2, h: 0.4, fontSize: 14, color: 'FFFFFF', hyperlink: { url: links[0] } });
+        sl.addNotes((el.innerText || '').replace(/\n{2,}/g, '\n').trim().slice(0, 3000));
+        if (onProg) onProg(i + 1, slides.length);
+      }
+    } finally { holder.remove(); }
+    return pptx;
+  }
+  window.__buildPptx = buildPptx;
+  let pptBusy = false;
+  $('pptBtn').onclick = async () => {
+    if (pptBusy || !slides.length) return; pptBusy = true;
+    const btn = $('pptBtn'), old = btn.textContent; btn.disabled = true;
+    try {
+      const pptx = await buildPptx((n, t) => { btn.textContent = '⏳ Đang tạo ' + n + '/' + t; });
+      await pptx.writeFile({ fileName: 'Slide-CLB-Thanh-Tri-' + key + '.pptx' });
+      note('Đã tạo file PowerPoint — kiểm tra thư mục Tải xuống');
+    } catch (e) { note('Không xuất được PowerPoint: ' + (e && e.message || e)); }
+    btn.textContent = old; btn.disabled = false; pptBusy = false;
+  };
 
   // Mục còn thiếu + tin Zalo soạn sẵn
   let zalo = '';
