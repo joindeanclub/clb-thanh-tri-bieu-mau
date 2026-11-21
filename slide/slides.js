@@ -89,6 +89,25 @@
              <div class="row sub">${rest.map((p) => pcard(p)).join('')}</div></div>`,
     }));
 
+    // 2b. Nhiem vu ban dieu hanh (goi y phan cong, dua tren luong nhap lieu & trinh bay cua app)
+    const DUTY = {
+      'CHỦ TỊCH': ['Chủ trì buổi họp, giới thiệu giá trị cốt lõi và lợi ích hội viên', 'Định hướng kế hoạch, duyệt các hoạt động lớn của CLB', 'Đại diện CLB, tri ân tiền nhiệm và khép lại chương trình'],
+      'PHÓ CHỦ TỊCH': ['Hỗ trợ Chủ tịch điều hành, thay mặt khi Chủ tịch vắng', 'Phụ trách phần chào mừng hội viên mới', 'Điều phối trao cơ hội: referral, closed business'],
+      'TỔNG THƯ KÝ': ['Ghi biên bản, quản lý danh sách và hồ sơ hội viên', 'Tổng hợp báo cáo thu chi hằng tháng', 'Báo cáo chỉ số tham dự, referral, closed business'],
+      'TB THÀNH VIÊN': ['Nhập hồ sơ hội viên mới dự kiến kết nạp (ảnh, doanh nghiệp, ngành nghề)', 'Cập nhật tổng số thành viên mỗi tháng', 'Chăm sóc, giúp hội viên mới hòa nhập'],
+      'TB TRUYỀN THÔNG & SỰ KIỆN': ['Nhập lịch sự kiện sắp tới: thăm doanh nghiệp, Business Tour', 'Truyền thông trước và sau họp: hình ảnh, bài đăng', 'Phụ trách bốc thăm trúng thưởng và hậu cần'],
+      'TB KHÁCH MỜI': ['Mời, đón khách mời và ghi nhận người giới thiệu', 'Gửi thư mời, tổng hợp danh sách khách mời mỗi tháng', 'Theo dõi khách mời trở thành hội viên'],
+      'TB ĐÀO TẠO': ['Chốt diễn giả, chủ đề; nhập ảnh, tóm tắt, link bài đào tạo', 'Chốt doanh nghiệp showcase và bài giới thiệu', 'Điều phối phần 30 giây kết nối'],
+    };
+    const dutyCard = (p) => `<div class="dcard"><div class="dtop">${avatar(p.anh, 's')}<div><b>${esc(p.ten)}</b><i>${esc(p.vaiTro)}</i></div></div>
+      <ul>${(DUTY[p.vaiTro] || []).map((t) => `<li>${esc(t)}</li>`).join('')}</ul></div>`;
+    const dutyOrder = Object.keys(DUTY);
+    const dutyPeople = dutyOrder.map((r) => bdh.find((p) => p.vaiTro === r)).filter(Boolean);
+    add('nhiemvu', 'bdh', F({
+      title: 'NHIỆM VỤ BAN ĐIỀU HÀNH', sub: 'Gợi ý phân công để buổi họp tròn trịa và slide luôn đủ thông tin', label: 'Gợi ý nhiệm vụ ' + nk,
+      body: `<div class="duty">${dutyPeople.map(dutyCard).join('')}</div>`,
+    }));
+
     // 3. Lich su
     const hist = [
       ['KẾT NỐI', 'image38.png', 'Tạo mạng lưới liên kết bền vững. Gom nguồn lực nhỏ thành sức mạnh lớn. Phá vỡ khoảng cách giữa các doanh nghiệp.'],

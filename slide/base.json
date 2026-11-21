@@ -198,6 +198,33 @@
     "thu": [],
     "chi": []
    }
+  },
+  "2026-11": {
+   "chuDe": {
+    "tieuDe": "WHO IS YOUR ROOM ?"
+   },
+   "dienGia": {
+    "ten": "Nguyễn Thanh Tung",
+    "chucDanh": "Giám đốc - Công ty TNHH kim khí Anh Minh",
+    "anh": "uploads/mwq44onk-chan-dung.jpg"
+   },
+   "hoiVienMoi": [],
+   "khachMoi": [
+    {
+     "ten": "",
+     "dn": "",
+     "nguoiMoi": ""
+    }
+   ],
+   "showcase": {
+    "anh": "uploads/mwq45tpf-chan-dung.jpg",
+    "ten": "NGUYỄN ĐỨC ÂN",
+    "dn": "CÔNG TY CP UCOMAT"
+   },
+   "taiChinh": {
+    "thu": [],
+    "chi": []
+   }
   }
  }
 }
