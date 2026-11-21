@@ -26,7 +26,7 @@
       const m = mo(x.thang);
       m.hoiVienMoi = (m.hoiVienMoi || []).filter((h) => !h.src || h.id !== x.id);
       m.hoiVienMoi.push({ src: 'form', id: x.id, ten: String(x.hoTen || '').toUpperCase(), dn: x.congTy || '', nganh: x.nganhNghe || '',
-        diaChi: x.diaChi || '', triLy: '', ngaySinh: x.ngaySinh || '', anh: photo(x.anhId, 500) });
+        diaChi: x.diaChi || '', triLy: (base.hvTriLy || {})[x.id] || '', ngaySinh: x.ngaySinh || '', anh: photo(x.anhId, 500) });
     });
     Object.entries(latest(ex.dienGia)).forEach(([k, x]) => {
       const m = mo(k);

@@ -92,14 +92,14 @@
     };
     const DCOL = { 'CHỦ TỊCH': '#b9770e', 'PHÓ CHỦ TỊCH': '#1760c4', 'TỔNG THƯ KÝ': '#0f9d94', 'TB THÀNH VIÊN': '#7a4dc0',
       'TB TRUYỀN THÔNG & SỰ KIỆN': '#d9531e', 'TB KHÁCH MỜI': '#2e8f4f', 'TB ĐÀO TẠO': '#c2306f' };
-    const pcard = (p, big) => `<div class="pcard ${big ? 'lead' : ''}"${DUTY[p.vaiTro] ? ` data-p="${esc(p.vaiTro)}" title="Rê chuột để xem nhiệm vụ"` : ''}>${avatar(p.anh, big ? 'l' : 'm')}<b>${esc(p.ten)}</b><i>${esc(p.vaiTro)}</i></div>`;
+    const pcard = (p, big) => `<div class="pcard ${big ? 'lead' : ''}"${DUTY[p.vaiTro] ? ` data-p="${esc(p.vaiTro)}" title="Bấm để xem nhiệm vụ"` : ''}>${avatar(p.anh, big ? 'l' : 'm')}<b>${esc(p.ten)}</b><i>${esc(p.vaiTro)}</i></div>`;
     const bigCard = (p) => `<div class="dbig" data-p="${esc(p.vaiTro)}" style="--c:${DCOL[p.vaiTro] || '#1760c4'}">
       <div class="dbl">${avatar(p.anh, 's')}<b>${esc(p.ten)}</b><i>${esc(p.vaiTro)}</i></div>
       <div class="dbr"><h4>NHIỆM VỤ &amp; VAI TRÒ</h4><ol>${(DUTY[p.vaiTro] || []).map((t, i) => `<li><span>${i + 1}</span><p>${esc(t)}</p></li>`).join('')}</ol></div></div>`;
     const popup = `<div class="dpop">${bdh.filter((p) => DUTY[p.vaiTro]).map(bigCard).join('')}</div>`;
     add('bdh', 'bdh', F({
       title: 'BAN ĐIỀU HÀNH ' + nk.toUpperCase(), sub: 'Đội ngũ lãnh đạo bản lĩnh, kiến tạo cơ hội phát triển bền vững cho CLB',
-      label: 'Rê chuột vào từng người để xem nhiệm vụ · ' + nk,
+      label: 'Bấm vào từng người để xem nhiệm vụ · ' + nk,
       body: `<div class="org"><div class="row top">${top.map((p) => pcard(p, p.vaiTro === 'CHỦ TỊCH')).join('')}</div>
              <div class="row sub">${rest.map((p) => pcard(p)).join('')}</div></div>`,
     }) + popup);
@@ -294,16 +294,15 @@
   window.CLB = { build, monthKey, parseKey, sessionNumber, esc, embedUrl };
 })();
 
-// Re chuot vao nguoi trong slide Ban dieu hanh -> hien the nhiem vu phong to giua man hinh; ra ngoai vien the thi dong
+// Bam chuot trai vao nguoi trong slide Ban dieu hanh -> hien the nhiem vu phong to giua man hinh; bam ra ngoai the thi dong
 (function () {
   if (typeof document === 'undefined' || window.__dutyWired) return;
   window.__dutyWired = true;
-  let cur = null, armed = false, t0 = 0, lastClose = 0;
-  const card = () => cur && cur.querySelector('.dbig.on');
+  let cur = null;
   function close() {
     if (!cur) return;
     cur.classList.remove('on'); cur.querySelectorAll('.dbig.on').forEach((c) => c.classList.remove('on'));
-    cur = null; armed = false; lastClose = Date.now();
+    cur = null;
   }
   function open(pc) {
     const slide = pc.closest('.slide'), pop = slide && slide.querySelector('.dpop');
@@ -313,29 +312,15 @@
     if (!big) return;
     pop.querySelectorAll('.dbig.on').forEach((c) => c.classList.remove('on'));
     big.classList.add('on'); pop.classList.add('on');
-    cur = pop; armed = false; t0 = Date.now();
+    cur = pop;
   }
   const SEL = '.slide.on .pcard[data-p]';
-  document.addEventListener('mouseover', (e) => {
-    if (cur && !document.contains(cur)) cur = null; // slide vua ve lai: bo trang thai cu
-    if (cur || Date.now() - lastClose < 350) return;
-    const pc = e.target.closest && e.target.closest(SEL);
-    if (pc) open(pc);
-  });
   document.addEventListener('click', (e) => {
-    if (cur && !document.contains(cur)) cur = null;
-    if (cur) { if (Date.now() - t0 > 400 && !(e.target.closest && e.target.closest('.dbig.on'))) close(); return; }
-    const pc = e.target.closest && e.target.closest(SEL);
+    if (cur && !document.contains(cur)) cur = null; // slide vua ve lai: bo trang thai cu
+    const t = e.target;
+    if (cur) { if (!(t.closest && t.closest('.dbig.on'))) close(); return; }
+    const pc = t.closest && t.closest(SEL);
     if (pc) open(pc);
-  });
-  document.addEventListener('mousemove', (e) => {
-    if (!cur) return;
-    if (!cur.closest('.slide.on')) { close(); return; }
-    const c = card(); if (!c) return;
-    const r = c.getBoundingClientRect();
-    const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-    if (inside) armed = true;
-    else if (armed || Date.now() - t0 > 2500) close();
   });
   document.addEventListener('keydown', () => { if (cur) close(); }, true);
 })();

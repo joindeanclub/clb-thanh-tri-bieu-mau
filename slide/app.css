@@ -154,15 +154,15 @@ html:has(body.print){overflow:visible;height:auto}
 
 .av.empty.logo{padding:0;background:#fff}.av.empty.logo img{object-fit:contain!important;object-position:center!important;padding:16%}
 
-/* Ban dieu hanh: re chuot -> the nhiem vu phong to (1/2 man hinh), nen mo; ra ngoai vien the thi dong */
+/* Ban dieu hanh: bam chuot -> the nhiem vu phong to (60% man hinh), nen mo; bam ra ngoai the thi dong */
 .pcard[data-p]{cursor:pointer;transition:transform .15s,box-shadow .15s}
 .pcard[data-p]:hover{transform:translateY(-5px);box-shadow:0 16px 34px rgba(15,42,104,.22)}
 .dpop{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(8,16,40,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .dpop.on{display:flex;animation:dpin .18s ease-out}
 @keyframes dpin{from{opacity:0}to{opacity:1}}
 .dbig{--c:#1760c4;display:none;width:960px;height:540px;border-radius:30px;overflow:hidden;background:#fff;border:4px solid var(--c);box-shadow:0 30px 80px rgba(0,0,0,.45)}
-.dbig.on{display:flex;animation:dpzoom .2s ease-out}
-@keyframes dpzoom{from{transform:scale(.92)}to{transform:scale(1)}}
+.dbig.on{display:flex;transform:scale(1.2);animation:dpzoom .2s ease-out}
+@keyframes dpzoom{from{transform:scale(1.04)}to{transform:scale(1.2)}}
 .dbl{flex:none;width:38%;background:linear-gradient(170deg,var(--c),color-mix(in srgb,var(--c) 68%,#000));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center}
 .dbl .av{width:230px;height:230px;border:8px solid #fff;box-shadow:0 10px 26px rgba(0,0,0,.3)}
 .dbl b{font-size:34px;line-height:1.2}
