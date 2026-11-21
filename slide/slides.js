@@ -99,13 +99,17 @@
       'TB KHÁCH MỜI': ['Mời, đón khách mời và ghi nhận người giới thiệu', 'Gửi thư mời, tổng hợp danh sách khách mời mỗi tháng', 'Theo dõi khách mời trở thành hội viên'],
       'TB ĐÀO TẠO': ['Chốt diễn giả, chủ đề; nhập ảnh, tóm tắt, link bài đào tạo', 'Chốt doanh nghiệp showcase và bài giới thiệu', 'Điều phối phần 30 giây kết nối'],
     };
-    const dutyCard = (p) => `<div class="dcard"><div class="dtop">${avatar(p.anh, 's')}<div><b>${esc(p.ten)}</b><i>${esc(p.vaiTro)}</i></div></div>
-      <ul>${(DUTY[p.vaiTro] || []).map((t) => `<li>${esc(t)}</li>`).join('')}</ul></div>`;
-    const dutyOrder = Object.keys(DUTY);
-    const dutyPeople = dutyOrder.map((r) => bdh.find((p) => p.vaiTro === r)).filter(Boolean);
+    const DCOL = { 'CHỦ TỊCH': '#b9770e', 'PHÓ CHỦ TỊCH': '#1760c4', 'TỔNG THƯ KÝ': '#0f9d94', 'TB THÀNH VIÊN': '#7a4dc0',
+      'TB TRUYỀN THÔNG & SỰ KIỆN': '#d9531e', 'TB KHÁCH MỜI': '#2e8f4f', 'TB ĐÀO TẠO': '#c2306f' };
+    const dutyCard = (p) => `<div class="dcard${p.vaiTro === 'CHỦ TỊCH' ? ' lead' : ''}" style="--c:${DCOL[p.vaiTro] || '#1760c4'}">
+      <div class="dl">${avatar(p.anh, 's')}<b>${esc(p.ten)}</b><i>${esc(p.vaiTro)}</i></div>
+      <ol class="dr">${(DUTY[p.vaiTro] || []).map((t, i) => `<li><span>${i + 1}</span><p>${esc(t)}</p></li>`).join('')}</ol></div>`;
+    const dutyBy = (r) => bdh.find((p) => p.vaiTro === r);
+    const rowTop = ['PHÓ CHỦ TỊCH', 'CHỦ TỊCH', 'TỔNG THƯ KÝ'].map(dutyBy).filter(Boolean);
+    const rowLow = ['TB THÀNH VIÊN', 'TB TRUYỀN THÔNG & SỰ KIỆN', 'TB KHÁCH MỜI', 'TB ĐÀO TẠO'].map(dutyBy).filter(Boolean);
     add('nhiemvu', 'bdh', F({
       title: 'NHIỆM VỤ BAN ĐIỀU HÀNH', sub: 'Gợi ý phân công để buổi họp tròn trịa và slide luôn đủ thông tin', label: 'Gợi ý nhiệm vụ ' + nk,
-      body: `<div class="duty">${dutyPeople.map(dutyCard).join('')}</div>`,
+      body: `<div class="duty"><div class="drow top">${rowTop.map(dutyCard).join('')}</div><div class="drow low">${rowLow.map(dutyCard).join('')}</div></div>`,
     }));
 
     // 3. Lich su
