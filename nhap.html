@@ -40,7 +40,7 @@ h2{font-size:21px;margin:0 0 4px;color:var(--navy)}
 .back{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:10px 16px;font:inherit;font-weight:600;color:var(--navy);cursor:pointer}
 .crumb{font-weight:700;color:var(--navy)}
 .cols{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
-@media(min-width:900px){.cols{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}.sticky{position:sticky;top:90px;align-self:start}}
+@media(min-width:900px){.cols{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr)}.sticky{position:sticky;top:90px;align-self:start}}
 .tabs{display:flex;gap:8px;margin-bottom:16px;background:#e6edf8;padding:6px;border-radius:14px}
 .tabs button{flex:1;border:0;background:transparent;padding:12px 8px;border-radius:10px;font:inherit;font-weight:700;color:var(--mute);cursor:pointer}
 .tabs button.on{background:#fff;color:var(--navy);box-shadow:0 2px 8px rgba(15,42,104,.15)}
@@ -239,7 +239,12 @@ body{background:radial-gradient(1200px 420px at 50% -120px,#dfeafb 0%,transparen
 header{background:rgba(11,37,89,.96);backdrop-filter:blur(8px);padding:10px 20px;box-shadow:0 1px 0 rgba(255,255,255,.06),0 6px 20px rgba(11,37,89,.25)}
 header img{height:40px;border-radius:50%;padding:3px;background:#fff}
 header .t b{font-size:17px;font-weight:700;letter-spacing:.2px}
-main{max-width:760px;padding:26px 16px 64px}
+main{max-width:1320px;padding:26px 16px 64px}
+#home,#report,#meeting,#done{max-width:760px;margin-left:auto;margin-right:auto}
+#work{max-width:1320px;margin:0 auto}
+#pre{padding:0!important;border:0!important;background:transparent!important;text-align:left!important}
+#pre small{display:block;margin:0 0 8px 4px;font-weight:800;letter-spacing:1px;font-size:12px;color:var(--mute)}
+#pvf{display:block;width:100%;aspect-ratio:16/9;border:0;border-radius:14px;background:#eef3fb;box-shadow:0 8px 24px rgba(11,37,89,.18)}
 .card{border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh)}
 h1{font-size:28px;font-weight:800;letter-spacing:-.3px}
 h2{font-weight:800;letter-spacing:-.2px}
@@ -340,7 +345,7 @@ h2{font-weight:800;letter-spacing:-.2px}
       <div class="card" id="formCard"><div id="tabs"></div><div id="form"></div></div>
       <div class="sticky" id="side">
         <div class="pre" id="pre"></div>
-        <p class="help" style="margin-top:10px;text-align:center">Đây là cách thông tin sẽ hiển thị trên slide CLB.</p>
+        <p class="help" style="margin-top:10px;text-align:center">Khung này hiện slide hiện tại của tháng đã chọn. Khi bạn nhập hoặc sửa, nó đổi theo ngay.</p>
       </div>
     </div>
     <div class="card recent"><h3>Các mục đã nhập (mới nhất ở trên)</h3><div id="recent"></div></div>
@@ -572,27 +577,27 @@ h2{font-weight:800;letter-spacing:-.2px}
 
   // ----- Xem truoc -----
   function val(id) { return $(id) ? $(id).value.trim() : ''; }
-  function preview() {
-    var h = '<small>XEM TRƯỚC TRÊN SLIDE</small>';
-    var pv = '<div class="pv">' + ((photo || editPhoto) ? '<img src="' + (photo || editPhoto) + '">' : 'Ảnh chân dung') + '</div>';
-    if (kind === 'hoiVien') {
-      h += pv + '<b>' + esc((val('hoTen') || 'HỌ VÀ TÊN').toUpperCase()) + '</b><div class="l">' + esc(val('congTy') || 'Tên công ty') + '</div>' +
-        '<div class="l">' + esc(val('nganhNghe') || 'Ngành nghề') + '</div><div class="l">' + esc(val('diaChi') || 'Địa chỉ') + '</div>' +
-        '<span class="tag">HỘI VIÊN MỚI · ' + esc(monthLabel(val('thang'))) + '</span>';
-    } else if (kind === 'suKien') {
-      h += '<div style="font-size:42px">📅</div><b>' + esc(val('tenSuKien') || 'TÊN SỰ KIỆN').toUpperCase() + '</b><div class="l">' +
-        esc([fmtDate(val('ngay')), val('gio')].filter(Boolean).join(' · ') || 'Ngày · Giờ') + '</div><div class="l">' + esc(val('diaDiem') || 'Địa điểm') + '</div>' +
-        '<div class="l">' + esc(val('moTa')) + '</div>';
-    } else if (kind === 'dienGia') {
-      h += pv + '<b>' + esc(val('hoTen') || 'Họ tên diễn giả') + '</b><div class="l">' + esc(val('chucDanh') || 'Chức danh') + '</div>' +
-        '<div class="l"><b style="font-size:16px">' + esc(val('chuDe') || 'Chủ đề chia sẻ') + '</b></div><span class="tag">DIỄN GIẢ · ' + esc(monthLabel(val('thang'))) + '</span>';
-    } else if (kind === 'taiChinh') {
-      h += '<div style="font-size:42px">💰</div><b>BÁO CÁO TÀI CHÍNH</b><div class="l">Buổi họp ' + esc(monthLabel(val('thang'))) + '</div>';
-    } else {
-      h += pv + '<b>' + esc((val('hoTen') || 'HỌ TÊN').toUpperCase()) + '</b><div class="l">' + esc(val('doanhNghiep') || 'Tên doanh nghiệp') + '</div>' +
-        '<span class="tag">SHOWCASE · ' + esc(monthLabel(val('thang'))) + '</span>';
+  var pvT = null, pvReady = false;
+  // Xem truoc = chinh slide that (trang slide/preview.html): luc binh thuong hien slide hien tai, khi nhap/sua thi doi theo
+  function pvPayload() {
+    var f = {}; allFields().forEach(function (x) { f[x.id] = $(x.id) ? $(x.id).value : ''; });
+    var any = Object.keys(f).some(function (k) { return k !== 'thang' && String(f[k]).trim() !== ''; }) || !!photo;
+    var fin = null;
+    if (kind === 'taiChinh') {
+      var clean = function (a) { return a.filter(function (r) { return String(r.ten || '').trim(); }).map(function (r) { return { ten: r.ten, so: money(r.so) }; }); };
+      fin = { dauKy: money(f.dauKy), thu: clean(rows.thu), chi: clean(rows.chi) };
+      any = any || fin.thu.length > 0 || fin.chi.length > 0;
     }
-    $('pre').innerHTML = h;
+    return { type: 'clb-preview', kind: kind, form: (any || editing) ? f : null, photo: photo || editPhoto || '', thang: f.thang || '', editingId: editing ? editing.id : '', fin: fin };
+  }
+  function preview() {
+    if (!$('pvf')) {
+      $('pre').innerHTML = '<small>XEM TRƯỚC TRÊN SLIDE</small><iframe id="pvf" src="slide/preview.html" title="Xem trước slide"></iframe>';
+      $('pvf').addEventListener('load', function () { pvReady = true; preview(); });
+    }
+    if (!pvReady) return;
+    clearTimeout(pvT);
+    pvT = setTimeout(function () { try { $('pvf').contentWindow.postMessage(pvPayload(), '*'); } catch (e) {} }, 120);
   }
 
   // ----- Dung giao dien -----
@@ -714,10 +719,10 @@ h2{font-weight:800;letter-spacing:-.2px}
     }).join('');
     var rn = box.querySelectorAll('.rn'), rs = box.querySelectorAll('.rs'), xs = box.querySelectorAll('.x');
     rows[l].forEach(function (r, i) {
-      rn[i].oninput = function () { r.ten = rn[i].value; };
+      rn[i].oninput = function () { r.ten = rn[i].value; preview(); };
       rs[i].oninput = function () {
         var n = rs[i].value.replace(/[^0-9]/g, ''); rs[i].value = n ? Number(n).toLocaleString('vi-VN') : '';
-        r.so = rs[i].value; totals();
+        r.so = rs[i].value; totals(); preview();
       };
       xs[i].onclick = function () { rows[l].splice(i, 1); if (!rows[l].length) rows[l].push({ ten: '', so: '' }); drawList(l); totals(); };
     });
