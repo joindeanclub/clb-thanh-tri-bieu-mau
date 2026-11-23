@@ -53,6 +53,8 @@ body.editing #edit{display:flex}
 </head>
 <body>
 <div id="stageWrap"><div id="stage"></div></div>
+<div id="loading" style="position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#fff;font:600 20px 'Segoe UI',sans-serif;text-align:center;padding:20px"><div style="width:46px;height:46px;border:5px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite"></div>Đang tải slide…</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 <div id="status"></div>
 <div id="bar">
   <button id="prev" title="Slide trước (←)">◀</button>
@@ -171,19 +173,40 @@ body.editing #edit{display:flex}
   $('vol').oninput = (e) => { userVol = Number(e.target.value) / 100; if (musicOn && !audio.paused) fadeTo(userVol, 300); };
 
   // ---------------- Tai & lam moi du lieu ----------------
+  const CK = 'clb-cache-v1';
+  function readCache() { try { return JSON.parse(localStorage.getItem(CK) || 'null'); } catch (e) { return null; } }
+  function writeCache(d) { try { localStorage.setItem(CK, JSON.stringify({ base: d.base, ex: d.ex, people: d.people, t: Date.now() })); } catch (e) {} }
+  function apply(d, first) {
+    data = d; store = CLBData.merge(d.base, d.ex); people = d.people || [];
+    if (first) { key = params.get('m') || CLB.monthKey(); userVol = Number((store.music || {}).volume || 0.6); $('vol').value = Math.round(userVol * 100); }
+    fillMonths(); render(); if (editing) paintEdit();
+    const l = $('loading'); if (l) l.remove();
+  }
   async function refresh(first) {
     if (!first && (editing || dirty.size)) return;
+    let shownOld = false;
+    if (first) {
+      // 1) du lieu cu gan nhat da luu tren trinh duyet; 2) neu chua co thi ban goc (tai rat nhanh)
+      const c = readCache();
+      if (c && c.base) { apply({ base: c.base, ex: c.ex || {}, people: c.people || [] }, true); shownOld = true; }
+      else { try { apply(await CLBData.loadSeed(), true); shownOld = true; } catch (e) {} }
+      if (shownOld) note('Đang hiện dữ liệu lưu gần nhất, đang cập nhật…');
+    }
     try {
       const d = await CLBData.load();
+      writeCache(d);
       const h = JSON.stringify(d.base) + JSON.stringify(d.ex);
-      people = d.people;
       if (first || h !== lastHash) {
-        data = d; store = d.store; if (first) { key = params.get('m') || CLB.monthKey(); userVol = Number((store.music || {}).volume || 0.6); $('vol').value = Math.round(userVol * 100); }
-        fillMonths(); render(); if (editing) paintEdit();
-        if (!first) note('Đã cập nhật dữ liệu mới');
+        const wasFirstEmpty = first && !shownOld;
+        apply(d, wasFirstEmpty);
+        if (first && shownOld) note('Đã cập nhật dữ liệu mới nhất');
+        else if (!first) note('Đã cập nhật dữ liệu mới');
       }
       lastHash = h;
-    } catch (e) { if (first) document.body.insertAdjacentHTML('beforeend', '<p style="position:fixed;top:40%;width:100%;text-align:center;color:#fff;font:20px sans-serif">Không tải được dữ liệu. Kiểm tra mạng rồi tải lại trang.</p>'); }
+    } catch (e) {
+      if (first && shownOld) note('Chưa kết nối được máy chủ — đang hiện dữ liệu cũ gần nhất', true);
+      else if (first) { const l = $('loading'); if (l) l.innerHTML = 'Không tải được dữ liệu.<br>Kiểm tra mạng rồi tải lại trang.'; }
+    }
   }
 
   // ---------------- Bang sua trang ----------------

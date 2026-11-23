@@ -126,6 +126,13 @@
     return { base, ex, store: merge(base, ex), people: c.people || [] };
   }
 
+  // Ban goc (tai rat nhanh tu GitHub Pages) de hien ngay khi chua co du lieu da luu
+  async function loadSeed() {
+    const seed = await fetch((CFG.baseUrl || 'base.json') + '?t=' + Date.now()).then((r) => r.json());
+    const base = overlay(seed, {});
+    return { base, ex: {}, store: merge(base, {}), people: [] };
+  }
+
   // Luu 1 khoa cai dat len Sheet (settings | fixed | texts | music | hvTriLy | m:YYYY-MM)
   async function saveKey(key, value) {
     const r = await post({ action: 'saveSetting', key, value, who: 'Trang web' });
@@ -142,5 +149,5 @@
     return r.result || [];
   }
 
-  window.CLBData = { load, merge, missing, zaloMessage, photo, saveKey, upload, history };
+  window.CLBData = { load, loadSeed, merge, missing, zaloMessage, photo, saveKey, upload, history };
 })();
