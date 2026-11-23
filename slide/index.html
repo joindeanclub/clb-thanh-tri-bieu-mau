@@ -17,8 +17,38 @@
 #miss button{border:0;border-radius:12px;padding:11px 18px;font:inherit;font-weight:700;cursor:pointer;background:#e4ecfa;color:#0b2559}
 #miss button.p{background:#1760c4;color:#fff}
 #missBtn.has{background:#c9302c!important}
-#status{position:fixed;left:12px;top:10px;z-index:30;font:12px "Segoe UI",sans-serif;color:#fff;background:rgba(10,18,36,.55);padding:4px 10px;border-radius:14px;opacity:0;transition:opacity .3s}
+#status{position:fixed;left:12px;top:10px;z-index:60;font:13px "Segoe UI",sans-serif;color:#fff;background:rgba(10,18,36,.75);padding:6px 14px;border-radius:14px;opacity:0;transition:opacity .3s;pointer-events:none}
 #status.show{opacity:1}
+#status.bad{background:#b3262b}
+
+/* ---- Bang sua trang ---- */
+body.editing #stageWrap{right:min(420px,92vw)}
+body.editing #bar{right:min(420px,92vw)}
+#edit{position:fixed;top:0;right:0;bottom:0;width:min(420px,92vw);z-index:50;background:#fff;color:#14213d;display:none;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.35);font-family:"Segoe UI",Roboto,Arial,sans-serif}
+body.editing #edit{display:flex}
+#edit .eh{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#0b2559;color:#fff}
+#edit .eh b{flex:1;font-size:17px}
+#edit .eh button{background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:10px;padding:6px 12px;font-size:16px;cursor:pointer}
+#ebody{flex:1;overflow:auto;padding:14px 16px 24px}
+#edit label{display:block;font-weight:700;font-size:13.5px;margin:12px 0 4px;color:#22304d}
+#edit input,#edit textarea{width:100%;box-sizing:border-box;border:1.5px solid #cfdaee;border-radius:10px;padding:9px 11px;font:inherit;font-size:15px;background:#fbfdff}
+#edit textarea{min-height:84px;resize:vertical}
+#edit input:focus,#edit textarea:focus{outline:0;border-color:#1760c4;box-shadow:0 0 0 3px rgba(23,96,196,.15)}
+#edit .en{background:#eef4fd;border-left:4px solid #1760c4;border-radius:10px;padding:10px 12px;font-size:14px;margin:10px 0}
+#edit .el h5{margin:16px 0 6px;font-size:15px;color:#0b2559}
+#edit .item{border:1.5px solid #dbe5f6;border-radius:14px;padding:4px 12px 12px;margin:10px 0;background:#f7faff}
+#edit .item .ib{display:flex;gap:6px;margin-top:10px}
+#edit .eb2{border:0;border-radius:10px;padding:8px 12px;font:inherit;font-weight:700;font-size:13.5px;cursor:pointer;background:#e4ecfa;color:#0b2559}
+#edit .eb2.del{background:#fdeaec;color:#b3262b}
+#edit .ph{display:flex;align-items:center;gap:12px;margin:8px 0}
+#edit .ph img{width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 0 0 2px #1760c4;background:#e8eef9}
+#edit .ef{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid #e1e8f4;background:#f5f8fd}
+#edit .ef button{border:0;border-radius:12px;padding:11px 16px;font:inherit;font-weight:800;cursor:pointer;background:#e4ecfa;color:#0b2559}
+#edit .ef button.p{background:#12935f;color:#fff;flex:1}
+#estat{font-size:12.5px;color:#5b6a86}
+#edit .hist{border:1.5px solid #dbe5f6;border-radius:12px;padding:10px 12px;margin:8px 0;font-size:13.5px}
+#editBtn.on{background:#d99a14!important;color:#0b2559!important}
+#musicBtn{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -29,10 +59,20 @@
   <span class="cnt2" id="cnt">1/1</span>
   <button id="next" title="Slide sau (→)">▶</button>
   <select id="monthSel" title="Chọn tháng"></select>
-  <button id="pptBtn" title="Tải toàn bộ slide tháng này thành file PowerPoint">📥 Xuất PowerPoint</button>
+  <button id="editBtn" title="Sửa nội dung của trang đang xem">✏️ Sửa trang này</button>
+  <button id="musicBtn" title="Bật/tắt nhạc nền theo từng phần">🔇 Bật nhạc</button>
+  <label title="Âm lượng" style="display:flex;align-items:center;gap:6px">🔈<input id="vol" type="range" min="0" max="100" value="60" style="width:90px"></label>
+  <button id="pptBtn" title="Tải toàn bộ slide tháng này thành file PowerPoint">📥 PowerPoint</button>
   <button id="missBtn" title="Các mục còn thiếu của slide">📋 Còn thiếu</button>
   <button id="fsBtn" title="Toàn màn hình (F)">⛶</button>
 </div>
+
+<div id="edit">
+  <div class="eh"><b id="etitle">Sửa trang</b><button id="ehist" title="Xem các bản đã lưu trước đó">↩ Bản cũ</button><button id="eclose" title="Đóng">✕</button></div>
+  <div id="ebody"></div>
+  <div class="ef"><button class="p" id="esave">💾 Lưu</button><span id="estat"></span></div>
+</div>
+
 <div id="miss"><div class="box">
   <h3>Các mục còn thiếu</h3><div id="missBody"></div>
   <div class="r"><button id="missClose">Đóng</button><button class="p" id="missCopy">Sao chép tin Zalo</button></div>
@@ -47,13 +87,22 @@
 (function () {
   const $ = (id) => document.getElementById(id);
   const stage = $('stage');
-  let store = null, people = [], key = '', slides = [], idx = 0, lastHash = '';
+  const esc = CLB.esc;
+  let data = null, store = null, people = [], key = '', slides = [], idx = 0, lastHash = '';
+  let editing = false, dirty = new Set(), renderT = null;
   const params = new URLSearchParams(location.search);
 
-  function fit() { stage.style.transform = 'scale(' + Math.min(innerWidth / 1920, innerHeight / 1080) + ')'; }
+  function fit() {
+    const w = $('stageWrap').clientWidth, h = $('stageWrap').clientHeight;
+    stage.style.transform = 'scale(' + Math.min(w / 1920, h / 1080) + ')';
+  }
   addEventListener('resize', fit); fit();
 
-  function allMonths() { const s = new Set(Object.keys(store.months || {})); s.add(CLB.monthKey()); return [...s].sort(); }
+  function allMonths() {
+    const s = new Set(Object.keys(store.months || {})); s.add(CLB.monthKey()); s.add(key);
+    const d = new Date(); s.add(CLB.monthKey(new Date(d.getFullYear(), d.getMonth() + 1, 1)));
+    return [...s].filter(Boolean).sort();
+  }
   function fillMonths() {
     $('monthSel').innerHTML = allMonths().map((k) => { const p = CLB.parseKey(k);
       return '<option value="' + k + '"' + (k === key ? ' selected' : '') + '>Tháng ' + p.m + '/' + p.y + ' (buổi ' + CLB.sessionNumber(store, k) + ')</option>'; }).join('');
@@ -63,14 +112,20 @@
     [...stage.children].forEach((el, n) => el.classList.toggle('on', n === idx));
     $('cnt').textContent = (idx + 1) + '/' + slides.length;
     try { sessionStorage.setItem('clb-idx', idx); } catch (e) {}
+    applyMusic();
+    if (editing) paintEdit();
   }
+  function recompute() { store = CLBData.merge(data.base, data.ex); }
   function render() {
     slides = CLB.build(store, key);
     stage.innerHTML = slides.map((s) => '<section class="slide" data-id="' + s.id + '">' + s.html + '</section>').join('');
-    wireDraw(); show(Math.min(idx, slides.length - 1));
+    wireDraw();
+    idx = Math.min(idx, slides.length - 1);
+    [...stage.children].forEach((el, n) => el.classList.toggle('on', n === idx));
+    $('cnt').textContent = (idx + 1) + '/' + slides.length;
     const m = CLBData.missing(store, key), n = Object.values(m).reduce((t, a) => t + a.length, 0);
     $('missBtn').classList.toggle('has', n > 0);
-    $('missBtn').textContent = n ? '📋 Còn thiếu (' + n + ')' : '✅ Đã đủ thông tin';
+    $('missBtn').textContent = n ? '📋 Còn thiếu (' + n + ')' : '✅ Đã đủ';
   }
   function wireDraw() {
     const btn = $('drawBtn'); if (!btn) return;
@@ -87,39 +142,207 @@
     };
     btn.onclick = () => window.__draw();
   }
-  function note(t) { const s = $('status'); s.textContent = t; s.classList.add('show'); clearTimeout(s._t); s._t = setTimeout(() => s.classList.remove('show'), 3500); }
+  function note(t, bad) { const s = $('status'); s.textContent = t; s.classList.toggle('bad', !!bad); s.classList.add('show'); clearTimeout(s._t); s._t = setTimeout(() => s.classList.remove('show'), bad ? 6000 : 3500); }
 
+  // ---------------- Nhac nen (theo tung phan, tang giam am luong tu tu) ----------------
+  const audio = new Audio(); audio.loop = true;
+  let musicOn = false, curSec, loadedUrl = '', fadeT = null, userVol = 0.6;
+  function fadeTo(v, ms, done) {
+    clearInterval(fadeT); v = Math.max(0, Math.min(1, v));
+    const from = audio.volume, steps = Math.max(1, Math.round(ms / 40)); let n = 0;
+    fadeT = setInterval(() => { n++; audio.volume = Math.max(0, Math.min(1, from + (v - from) * (n / steps))); if (n >= steps) { clearInterval(fadeT); if (done) done(); } }, 40);
+  }
+  function wantUrl() { const sec = slides[idx] && slides[idx].music; return (sec && store && store.music && store.music[sec]) || ''; }
+  function applyMusic(force) {
+    if (!musicOn) return;
+    const sec = slides[idx] && slides[idx].music;
+    if (sec === curSec && !force) return;
+    curSec = sec;
+    const url = wantUrl();
+    if (!url) { fadeTo(0, 1500, () => { audio.pause(); loadedUrl = ''; }); return; }
+    if (loadedUrl === url && !audio.paused) { fadeTo(userVol, 800); return; }
+    fadeTo(0, 700, () => { loadedUrl = url; audio.src = url; audio.currentTime = 0; audio.volume = 0; audio.play().then(() => fadeTo(userVol, 1800)).catch(() => note('Trình duyệt chặn phát nhạc — bấm nút nhạc lần nữa', true)); });
+  }
+  $('musicBtn').onclick = () => {
+    musicOn = !musicOn;
+    $('musicBtn').textContent = musicOn ? '🔊 Tắt nhạc' : '🔇 Bật nhạc';
+    if (musicOn) { curSec = undefined; applyMusic(true); } else fadeTo(0, 900, () => audio.pause());
+  };
+  $('vol').oninput = (e) => { userVol = Number(e.target.value) / 100; if (musicOn && !audio.paused) fadeTo(userVol, 300); };
+
+  // ---------------- Tai & lam moi du lieu ----------------
   async function refresh(first) {
+    if (!first && (editing || dirty.size)) return;
     try {
       const d = await CLBData.load();
-      const h = JSON.stringify(d.store.months) + JSON.stringify(d.store.fixed.suKien);
+      const h = JSON.stringify(d.base) + JSON.stringify(d.ex);
       people = d.people;
       if (first || h !== lastHash) {
-        store = d.store; if (first) key = params.get('m') || CLB.monthKey();
-        fillMonths(); render();
+        data = d; store = d.store; if (first) { key = params.get('m') || CLB.monthKey(); userVol = Number((store.music || {}).volume || 0.6); $('vol').value = Math.round(userVol * 100); }
+        fillMonths(); render(); if (editing) paintEdit();
         if (!first) note('Đã cập nhật dữ liệu mới');
       }
       lastHash = h;
     } catch (e) { if (first) document.body.insertAdjacentHTML('beforeend', '<p style="position:fixed;top:40%;width:100%;text-align:center;color:#fff;font:20px sans-serif">Không tải được dữ liệu. Kiểm tra mạng rồi tải lại trang.</p>'); }
   }
 
+  // ---------------- Bang sua trang ----------------
+  const NAMES = { bia: 'Bìa', bdh: 'Ban điều hành', lichsu: 'Lịch sử', triann: 'Tri ân tiền nhiệm', giatri: 'Giá trị cốt lõi', loiich: 'Lợi ích hội viên', chude: 'Chủ đề', diengia: 'Diễn giả',
+    'ketnap-0': 'Chào mừng hội viên mới', '30s': '30 giây kết nối', khachmoi: 'Khách mời', showcase: 'Showcase', cohoi: 'Trao cơ hội', thuky: 'Báo cáo thư ký', taichinh: 'Tài chính', sukien: 'Sự kiện', boctham: 'Bốc thăm', camon: 'Cảm ơn' };
+  const getp = (o, p) => p.split('.').reduce((a, k) => (a == null ? a : a[k]), o);
+  function setp(o, p, v) { const ks = p.split('.'); let a = o; ks.slice(0, -1).forEach((k) => { if (a[k] == null || typeof a[k] !== 'object') a[k] = {}; a = a[k]; }); a[ks[ks.length - 1]] = v; }
+  const keyOf = (c) => c.scope === 'settings' ? 'settings' : c.scope === 'fixed' ? 'fixed' : c.scope === 'text' ? 'texts' : 'm:' + key;
+  function rootOf(c) {
+    const b = data.base;
+    if (c.scope === 'settings') return b.settings || (b.settings = {});
+    if (c.scope === 'fixed') return b.fixed || (b.fixed = {});
+    if (c.scope === 'text') return b.texts || (b.texts = {});
+    b.months = b.months || {}; return b.months[key] || (b.months[key] = {});
+  }
+  const getv = (c) => getp(rootOf(c), c.path);
+  const setv = (c, v) => setp(rootOf(c), c.path, v);
+  const ctls = () => ((slides[idx] && slides[idx].controls) || []);
+  const imgUrl = (v) => !v ? '' : (String(v).indexOf('drive:') === 0 ? 'https://lh3.googleusercontent.com/d/' + String(v).slice(6) + '=w200' : v);
+
+  function fieldHtml(def, attrs, value, ph) {
+    const t = def.type || 'text', v = value == null ? '' : value;
+    if (t === 'img') return '<label>' + esc(def.label) + '</label><div class="ph"><img src="' + esc(imgUrl(v)) + '" alt=""' + (v ? '' : ' style="visibility:hidden"') + '><button class="eb2" data-img="' + attrs.k + '">📷 Chọn ảnh</button></div>';
+    if (t === 'area') return '<label>' + esc(def.label) + '</label><textarea ' + attrs.a + ' placeholder="' + esc(ph || '') + '">' + esc(v) + '</textarea>';
+    return '<label>' + esc(def.label) + '</label><input ' + attrs.a + (t === 'number' ? ' type="number"' : ' type="text"') + ' value="' + esc(v) + '" placeholder="' + esc(ph || '') + '">';
+  }
+  function paintEdit() {
+    const sl = slides[idx]; if (!sl) return;
+    const base = String(sl.id).replace(/-\d+$/, ''), nm = NAMES[sl.id] || NAMES[base] || NAMES[sl.id.split('-')[0]] || sl.id;
+    $('etitle').textContent = '✏️ Sửa trang: ' + nm;
+    const cs = ctls();
+    if (!cs.length) { $('ebody').innerHTML = '<div class="en">Trang này không có nội dung nào để sửa trực tiếp (nội dung được lấy từ file hoặc biểu mẫu).</div>'; return; }
+    const keep = $('ebody').scrollTop;
+    $('ebody').innerHTML = cs.map((c, ci) => {
+      if (c.type === 'note') return '<div class="en">' + esc(c.text) + (c.open ? '<br><br><button class="eb2" data-open="' + c.open + '">Mở biểu mẫu để nhập →</button>' : '') + '</div>';
+      if (c.type === 'list') {
+        const arr = getv(c) || [];
+        return '<div class="el"><h5>' + esc(c.label) + '</h5>' + arr.map((it, li) => '<div class="item">' + c.item.map((f) =>
+          fieldHtml(f, { a: 'data-ci="' + ci + '" data-li="' + li + '" data-f="' + f.p + '"', k: ci + ':' + li + ':' + f.p }, it[f.p], '')).join('') +
+          '<div class="ib"><button class="eb2" data-mv="' + ci + ':' + li + ':-1">↑</button><button class="eb2" data-mv="' + ci + ':' + li + ':1">↓</button><button class="eb2 del" data-del="' + ci + ':' + li + '">Xóa</button></div></div>').join('') +
+          '<button class="eb2" data-add="' + ci + '">+ Thêm</button></div>';
+      }
+      const cur = getv(c);
+      return fieldHtml(c, { a: 'data-ci="' + ci + '"', k: ci + '::' }, (cur != null && cur !== '') ? cur : '', c.def);
+    }).join('');
+    $('ebody').scrollTop = keep;
+  }
+  function touch(c) { dirty.add(keyOf(c)); $('estat').textContent = '● Có thay đổi chưa lưu'; clearTimeout(renderT); renderT = setTimeout(() => { recompute(); render(); }, 350); }
+  $('ebody').addEventListener('input', (e) => {
+    const t = e.target; if (t.dataset.ci == null) return;
+    const c = ctls()[+t.dataset.ci]; if (!c) return;
+    let v = t.value; if (t.type === 'number') v = v === '' ? '' : Number(v);
+    if (t.dataset.li != null) { const arr = getv(c); arr[+t.dataset.li][t.dataset.f] = v; } else setv(c, v);
+    touch(c);
+  });
+  function cropSquare(file) {
+    return new Promise((res, rej) => {
+      const im = new Image();
+      im.onload = () => { const s = Math.min(im.width, im.height), sx = (im.width - s) / 2, sy = Math.max(0, (im.height - s) * 0.35);
+        const cv = document.createElement('canvas'); cv.width = cv.height = 600; cv.getContext('2d').drawImage(im, sx, sy, s, s, 0, 0, 600, 600); res(cv.toDataURL('image/jpeg', 0.9)); };
+      im.onerror = () => rej(new Error('Không đọc được ảnh')); im.src = URL.createObjectURL(file);
+    });
+  }
+  $('ebody').addEventListener('click', async (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.open) { openForm(b.dataset.open); return; }
+    if (b.dataset.add != null) { const c = ctls()[+b.dataset.add]; const arr = getv(c) || []; arr.push(JSON.parse(JSON.stringify(c.blank || {}))); setv(c, arr); touch(c); paintEdit(); return; }
+    if (b.dataset.del) { const [ci, li] = b.dataset.del.split(':').map(Number); const c = ctls()[ci]; if (!confirm('Xóa mục này?')) return; getv(c).splice(li, 1); touch(c); paintEdit(); return; }
+    if (b.dataset.mv) { const [ci, li, d] = b.dataset.mv.split(':').map(Number); const c = ctls()[ci], a = getv(c), j = li + d; if (j >= 0 && j < a.length) { [a[li], a[j]] = [a[j], a[li]]; touch(c); paintEdit(); } return; }
+    if (b.dataset.img) {
+      const [ci, li, f] = b.dataset.img.split(':'); const c = ctls()[+ci];
+      const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+      inp.onchange = async () => {
+        const file = inp.files[0]; if (!file) return;
+        try {
+          note('Đang tải ảnh lên…'); const du = await cropSquare(file); const id = await CLBData.upload(du, 'anh-trang');
+          if (li !== '') getv(c)[+li][f] = 'drive:' + id; else setv(c, 'drive:' + id);
+          touch(c); paintEdit(); note('Đã tải ảnh — nhớ bấm Lưu');
+        } catch (err) { note('Lỗi tải ảnh: ' + err.message, true); }
+      };
+      inp.click();
+    }
+  });
+  function valueFor(k) { const b = data.base; return k === 'settings' ? b.settings : k === 'fixed' ? b.fixed : k === 'texts' ? b.texts : b.months[k.slice(2)]; }
+  $('esave').onclick = async () => {
+    if (!dirty.size) { note('Không có thay đổi để lưu'); return; }
+    $('esave').disabled = true; $('estat').textContent = 'Đang lưu lên Google Sheet…';
+    try {
+      for (const k of [...dirty]) { await CLBData.saveKey(k, valueFor(k)); dirty.delete(k); }
+      $('estat').textContent = '✔ Đã lưu · mọi máy sẽ thấy ngay'; note('Đã lưu — mọi máy sẽ thấy nội dung mới');
+      lastHash = '';
+    } catch (e) { $('estat').textContent = '✖ ' + e.message; note('Không lưu được: ' + e.message, true); }
+    $('esave').disabled = false;
+  };
+  function setEditing(on) {
+    editing = on; document.body.classList.toggle('editing', on); $('editBtn').classList.toggle('on', on);
+    fit(); if (on) paintEdit();
+    if (window.parent !== window) window.parent.postMessage({ type: 'clb-edit-state', on: on }, '*');
+  }
+  $('editBtn').onclick = () => { if (editing) $('eclose').click(); else setEditing(true); };
+  $('eclose').onclick = () => {
+    if (dirty.size && !confirm('Còn thay đổi chưa lưu. Đóng và bỏ các thay đổi này?')) return;
+    const had = dirty.size; dirty.clear(); setEditing(false); if (had) { lastHash = ''; refresh(true); }
+  };
+  addEventListener('beforeunload', (e) => { if (dirty.size) { e.preventDefault(); e.returnValue = ''; } });
+  // Lenh tu khung ben ngoai (thanh dieu huong chung)
+  addEventListener('message', (e) => {
+    const d = e.data || {};
+    if (d.type === 'clb-edit') {
+      if (!!d.on === editing) return;
+      if (d.on) setEditing(true);
+      else if (dirty.size && !confirm('Còn thay đổi chưa lưu. Đóng và bỏ các thay đổi này?')) { window.parent.postMessage({ type: 'clb-tab', tab: 'sua' }, '*'); }
+      else { const had = dirty.size; dirty.clear(); setEditing(false); if (had) { lastHash = ''; refresh(true); } }
+    } else if (d.type === 'clb-missing') { if (store) $('missBtn').click(); else setTimeout(() => $('missBtn').click(), 1500); }
+  });
+  function openForm(ban) {
+    if (window.parent !== window) window.parent.postMessage({ type: 'clb-open-form', ban }, '*');
+    else location.href = '../nhap.html#ban=' + ban;
+  }
+
+  // Khoi phuc ban cu (lich su moi lan luu)
+  $('ehist').onclick = async () => {
+    const keys = [...new Set(ctls().filter((c) => c.type !== 'note').map(keyOf))];
+    if (!keys.length) { note('Trang này chưa có bản lưu nào'); return; }
+    $('ebody').innerHTML = '<div class="en">Đang tải các bản đã lưu…</div>';
+    const rows = [];
+    for (const k of keys) { try { (await CLBData.history(k)).forEach((h) => rows.push({ k, h })); } catch (e) {} }
+    rows.sort((a, b) => String(b.h.thoiGian).localeCompare(String(a.h.thoiGian)));
+    $('ebody').innerHTML = '<button class="eb2" id="hback">← Quay lại sửa</button><h5>Các bản đã lưu (mới nhất trước)</h5>' + (rows.length ? rows.map((r, i) =>
+      '<div class="hist"><b>' + esc(r.h.thoiGian) + '</b> · ' + esc(r.k === 'texts' ? 'chữ cố định' : r.k === 'fixed' ? 'dữ liệu chung' : r.k === 'settings' ? 'thiết lập chung' : 'tháng ' + r.k.slice(2)) +
+      '<br><button class="eb2" data-rest="' + i + '" style="margin-top:6px">↩ Khôi phục bản này</button></div>').join('') : '<div class="en">Chưa có bản lưu nào được ghi lại.</div>');
+    $('ebody')._rows = rows;
+    $('hback').onclick = () => paintEdit();
+    [].forEach.call($('ebody').querySelectorAll('[data-rest]'), (btn) => { btn.onclick = () => {
+      const r = $('ebody')._rows[+btn.dataset.rest]; let v; try { v = JSON.parse(r.h.value); } catch (e) { note('Bản này bị hỏng', true); return; }
+      const b = data.base; if (r.k === 'settings') b.settings = v; else if (r.k === 'fixed') b.fixed = v; else if (r.k === 'texts') b.texts = v; else b.months[r.k.slice(2)] = v;
+      dirty.add(r.k); recompute(); render(); paintEdit(); $('estat').textContent = '● Đã nạp bản cũ — bấm Lưu để áp dụng'; note('Đã nạp bản cũ. Bấm Lưu để áp dụng cho mọi máy');
+    }; });
+  };
+
+  // ---------------- Dieu khien ----------------
   $('prev').onclick = () => show(idx - 1);
   $('next').onclick = () => show(idx + 1);
   $('fsBtn').onclick = () => { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); };
-  $('monthSel').onchange = (e) => { key = e.target.value; idx = 0; render(); };
+  $('monthSel').onchange = (e) => { key = e.target.value; idx = 0; curSec = undefined; render(); applyMusic(true); if (editing) paintEdit(); };
   addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+    const tg = e.target.tagName; if (tg === 'SELECT' || tg === 'TEXTAREA' || tg === 'INPUT') return;
     if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(idx + 1); }
     else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(idx - 1); }
     else if (e.key === 'Home') show(0); else if (e.key === 'End') show(slides.length - 1);
     else if (e.key === 'f' || e.key === 'F') $('fsBtn').click();
+    else if (e.key === 'm' || e.key === 'M') $('musicBtn').click();
     else if (e.key === 'b' || e.key === 'B') { if (window.__draw && slides[idx].id === 'boctham') window.__draw(); }
   });
   let tx = null;
-  addEventListener('touchstart', (e) => { tx = e.touches[0].clientX; });
+  addEventListener('touchstart', (e) => { if (e.target.closest('#edit')) return; tx = e.touches[0].clientX; });
   addEventListener('touchend', (e) => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1)); tx = null; });
 
-  // ---- Xuat PowerPoint: moi slide chup thanh 1 anh 16:9 (giu nguyen giao dien), kem ghi chu van ban ----
+  // ---------------- Xuat PowerPoint: moi slide chup thanh 1 anh 16:9, kem ghi chu van ban ----------------
   async function buildPptx(onProg) {
     const pptx = new PptxGenJS(); pptx.layout = 'LAYOUT_16x9';
     pptx.title = 'Slide CLB Doanh nghiệp Thanh Trì - tháng ' + key;
@@ -154,18 +377,17 @@
     if (pptBusy || !slides.length) return; pptBusy = true;
     const btn = $('pptBtn'), old = btn.textContent; btn.disabled = true;
     try {
-      const pptx = await buildPptx((n, t) => { btn.textContent = '⏳ Đang tạo ' + n + '/' + t; });
+      const pptx = await buildPptx((n, t) => { btn.textContent = '⏳ ' + n + '/' + t; });
       await pptx.writeFile({ fileName: 'Slide-CLB-Thanh-Tri-' + key + '.pptx' });
       note('Đã tạo file PowerPoint — kiểm tra thư mục Tải xuống');
-    } catch (e) { note('Không xuất được PowerPoint: ' + (e && e.message || e)); }
+    } catch (e) { note('Không xuất được PowerPoint: ' + (e && e.message || e), true); }
     btn.textContent = old; btn.disabled = false; pptBusy = false;
   };
 
-  // Mục còn thiếu + tin Zalo soạn sẵn
+  // ---------------- Muc con thieu + tin Zalo soan san ----------------
   let zalo = '';
   $('missBtn').onclick = () => {
     const m = CLBData.missing(store, key);
-    const esc = CLB.esc;
     $('missBody').innerHTML = Object.keys(m).length
       ? Object.keys(m).map((b) => '<h4>' + esc(b) + '</h4><ul>' + m[b].map((t) => '<li>' + esc(t) + '</li>').join('') + '</ul>').join('')
       : '<div class="ok">✅ Slide tháng này đã đủ thông tin.</div>';
@@ -178,7 +400,11 @@
   $('missClose').onclick = () => { $('miss').style.display = 'none'; };
   $('missCopy').onclick = () => { const t = $('zl'); t.select(); try { navigator.clipboard.writeText(zalo); } catch (e) { document.execCommand('copy'); } $('missCopy').textContent = 'Đã sao chép ✓'; setTimeout(() => ($('missCopy').textContent = 'Sao chép tin Zalo'), 2000); };
 
-  refresh(true).then(() => { const s = params.get('s'); if (s !== null) show(Number(s)); if (params.get('thieu')) $('missBtn').click(); });
+  refresh(true).then(() => {
+    const s = params.get('s'); if (s !== null) show(Number(s));
+    if (params.get('thieu')) $('missBtn').click();
+    if (params.get('sua')) setEditing(true);
+  });
   setInterval(() => refresh(false), 20000);
 })();
 </script>

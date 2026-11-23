@@ -102,16 +102,45 @@
     return lines.join('\n');
   }
 
+  // Du lieu goc (base.json) + cai dat luu tren Sheet (ghi de) = "base"; sau do gop du lieu bieu mau (ex) thanh "store"
+  function overlay(seed, cfg) {
+    const b = JSON.parse(JSON.stringify(seed));
+    ['settings', 'fixed', 'texts', 'music', 'hvTriLy'].forEach((k) => { if (cfg[k] != null) b[k] = cfg[k]; });
+    Object.keys(cfg).forEach((k) => { if (k.indexOf('m:') === 0) { (b.months = b.months || {})[k.slice(2)] = cfg[k]; } });
+    b.texts = b.texts || {}; b.months = b.months || {}; b.music = b.music || {};
+    return b;
+  }
+
+  const post = (o) => fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow', body: JSON.stringify(o) }).then((r) => r.json());
+
   async function load() {
-    const [base, ex, ctx] = await Promise.all([
+    const [seed, ex, ctx, cfg] = await Promise.all([
       fetch((CFG.baseUrl || 'base.json') + '?t=' + Date.now()).then((r) => r.json()),
       getJson('action=export&token=' + encodeURIComponent(TOKEN)),
       getJson('action=context').catch(() => ({ people: [] })),
+      getJson('action=settings').catch(() => ({ result: {} })),
     ]);
     if (ex.error) throw new Error(ex.error);
     const c = ctx.result || ctx;
-    return { store: merge(base, ex), people: c.people || [] };
+    const base = overlay(seed, (cfg && cfg.result) || {});
+    return { base, ex, store: merge(base, ex), people: c.people || [] };
   }
 
-  window.CLBData = { load, merge, missing, zaloMessage, photo };
+  // Luu 1 khoa cai dat len Sheet (settings | fixed | texts | music | hvTriLy | m:YYYY-MM)
+  async function saveKey(key, value) {
+    const r = await post({ action: 'saveSetting', key, value, who: 'Trang web' });
+    if (!r.ok) throw new Error(r.error || 'Không lưu được');
+    return r.result;
+  }
+  async function upload(dataUrl, label) {
+    const r = await post({ action: 'uploadImage', dataUrl, label: label || 'anh' });
+    if (!r.ok) throw new Error(r.error || 'Không tải được ảnh');
+    return r.result.id;
+  }
+  async function history(key) {
+    const r = await getJson('action=history&key=' + encodeURIComponent(key));
+    return r.result || [];
+  }
+
+  window.CLBData = { load, merge, missing, zaloMessage, photo, saveKey, upload, history };
 })();

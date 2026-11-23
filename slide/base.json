@@ -190,7 +190,26 @@
    },
    "chuDe": {
     "tieuDe": "Who is in your room? ",
-    "moTa": "Hãy tưởng tượng… bạn sống cả đời trong 1 căn phòng, và căn phòng đó chỉ có 1 cánh cửa, và cánh cửa đó chỉ có thể vào được, vậy nên khi có ai đó bước vào cuộc đời bạn… họ sẽ ở đó mãi mãi.\n"
+    "moTa": "Hãy tưởng tượng… bạn sống cả đời trong 1 căn phòng, và căn phòng đó chỉ có 1 cánh cửa, và cánh cửa đó chỉ có thể vào được, vậy nên khi có ai đó bước vào cuộc đời bạn… họ sẽ ở đó mãi mãi.\n",
+    "files": [
+     {
+      "name": "Who is in your room.pptx",
+      "kind": "pages",
+      "urls": [
+       "uploads/mv2mmm3n-who-is-in-your-room/p-01.png",
+       "uploads/mv2mmm3n-who-is-in-your-room/p-02.png",
+       "uploads/mv2mmm3n-who-is-in-your-room/p-03.png",
+       "uploads/mv2mmm3n-who-is-in-your-room/p-04.png",
+       "uploads/mv2mmm3n-who-is-in-your-room/p-05.png",
+       "uploads/mv2mmm3n-who-is-in-your-room/p-06.png",
+       "uploads/mv2mmm3n-who-is-in-your-room/p-07.png",
+       "uploads/mv2mmm3n-who-is-in-your-room/p-08.png",
+       "uploads/mv2mmm3n-who-is-in-your-room/p-09.png",
+       "uploads/mv2mmm3n-who-is-in-your-room/p-10.png",
+       "uploads/mv2mmm3n-who-is-in-your-room/p-11.png"
+      ]
+     }
+    ]
    },
    "hoiVienMoi": [],
    "khachMoi": [],
@@ -201,6 +220,25 @@
   },
   "2026-11": {
    "chuDe": {
+    "files": [
+     {
+      "name": "Who is in your room.pptx",
+      "kind": "pages",
+      "urls": [
+       "uploads/mwq42y2x-who-is-in-your-room/p-01.png",
+       "uploads/mwq42y2x-who-is-in-your-room/p-02.png",
+       "uploads/mwq42y2x-who-is-in-your-room/p-03.png",
+       "uploads/mwq42y2x-who-is-in-your-room/p-04.png",
+       "uploads/mwq42y2x-who-is-in-your-room/p-05.png",
+       "uploads/mwq42y2x-who-is-in-your-room/p-06.png",
+       "uploads/mwq42y2x-who-is-in-your-room/p-07.png",
+       "uploads/mwq42y2x-who-is-in-your-room/p-08.png",
+       "uploads/mwq42y2x-who-is-in-your-room/p-09.png",
+       "uploads/mwq42y2x-who-is-in-your-room/p-10.png",
+       "uploads/mwq42y2x-who-is-in-your-room/p-11.png"
+      ]
+     }
+    ],
     "tieuDe": "WHO IS YOUR ROOM ?"
    },
    "dienGia": {
@@ -218,6 +256,26 @@
    ],
    "showcase": {
     "anh": "uploads/mwq45tpf-chan-dung.jpg",
+    "files": [
+     {
+      "name": "UCO MAT- GIOI THIEU 8 PHUT 21-11-2026.pptx",
+      "kind": "pages",
+      "urls": [
+       "uploads/mwq45yuh-uco-mat-gioi-thieu-8-phut-21-11-2026/p-01.png",
+       "uploads/mwq45yuh-uco-mat-gioi-thieu-8-phut-21-11-2026/p-02.png",
+       "uploads/mwq45yuh-uco-mat-gioi-thieu-8-phut-21-11-2026/p-03.png",
+       "uploads/mwq45yuh-uco-mat-gioi-thieu-8-phut-21-11-2026/p-04.png",
+       "uploads/mwq45yuh-uco-mat-gioi-thieu-8-phut-21-11-2026/p-05.png",
+       "uploads/mwq45yuh-uco-mat-gioi-thieu-8-phut-21-11-2026/p-06.png",
+       "uploads/mwq45yuh-uco-mat-gioi-thieu-8-phut-21-11-2026/p-07.png",
+       "uploads/mwq45yuh-uco-mat-gioi-thieu-8-phut-21-11-2026/p-08.png",
+       "uploads/mwq45yuh-uco-mat-gioi-thieu-8-phut-21-11-2026/p-09.png",
+       "uploads/mwq45yuh-uco-mat-gioi-thieu-8-phut-21-11-2026/p-10.png",
+       "uploads/mwq45yuh-uco-mat-gioi-thieu-8-phut-21-11-2026/p-11.png",
+       "uploads/mwq45yuh-uco-mat-gioi-thieu-8-phut-21-11-2026/p-12.png"
+      ]
+     }
+    ],
     "ten": "NGUYỄN ĐỨC ÂN",
     "dn": "CÔNG TY CP UCOMAT"
    },
@@ -226,6 +284,16 @@
     "chi": []
    }
   }
+ },
+ "texts": {},
+ "music": {
+  "volume": 0.6,
+  "start": "music/mv292wva-daddy-cool.mp3",
+  "bdh": "music/mv293dau-2-gioi-thieu-dai-bieu.mp3",
+  "ketnap": "music/mv2942aj-3-vinh-danh-nhac-soi-dong.mp3",
+  "cohoi": "music/mv294gua-bahama-mama.mp3",
+  "boctham": "music/mv294og7-8-nen-game-1-don-lo-2-lo-don.mp3",
+  "ketthuc": "music/mv295j9m-7-nhac-ket-thuc-su-kien.mp3"
  },
  "hvTriLy": {
   "f74113ae-495b-4d51-bd97-22d6111b45de": ""
